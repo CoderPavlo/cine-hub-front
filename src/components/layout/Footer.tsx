@@ -1,7 +1,12 @@
-import React from 'react'
+import React from "react";
+import { useLocation } from "react-router-dom";
 
 export default function Footer() {
-  return (
-    <div>Footer</div>
-  )
+  const location = useLocation();
+  const hideNavbarRoutes = ["/login"];
+  if (hideNavbarRoutes.includes(location.pathname)) {
+    return null;
+  }
+
+  return <div>Footer</div>;
 }
