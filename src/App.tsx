@@ -7,7 +7,7 @@ import {
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
 import MainPage from "./pages/MainPage";
-// import theme from "./theme.js";
+import theme from "./theme.js";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import LoginPage from "./pages/loginPage/LoginPage.tsx";
 import { useAppSelector } from "./hooks/storeHooks.ts";
