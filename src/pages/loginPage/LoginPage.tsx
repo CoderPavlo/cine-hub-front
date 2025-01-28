@@ -1,8 +1,8 @@
 import { Box, Typography, useTheme } from "@mui/material";
 import { useState } from "react";
 import SwitchSelector from "react-switch-selector";
-import SignUpForm from "../../components/loginPageComponents/SignUpForm";
-import LoginForm from "../../components/loginPageComponents/LoginForm";
+import SignUpForm from "../../components/auth/SignUpForm";
+import LoginForm from "../../components/auth/LoginForm";
 import "./Login.css";
 
 function LoginPage() {

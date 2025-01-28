@@ -4,11 +4,10 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import Navbar from "./components/layout/Navbar";
+import Navbar from "./components/layout/Navbar/Navbar.tsx";
 import Footer from "./components/layout/Footer";
 import MainPage from "./pages/MainPage";
-import theme from "./theme.js";
-import { CssBaseline, ThemeProvider } from "@mui/material";
+import { CssBaseline, ThemeProvider, useMediaQuery } from "@mui/material";
 import LoginPage from "./pages/loginPage/LoginPage.tsx";
 import { useAppSelector } from "./hooks/storeHooks.ts";
 import { getTheme } from "./store/slices/theme.ts";
@@ -18,8 +17,9 @@ export const role: "admin" | "user" = "user"; //for demo
 
 function App() {
   const {mode} = useAppSelector(state=>state.themeReducer); 
+  const systemMode = useMediaQuery('(prefers-color-scheme: dark)') ? 'dark' : 'light';
   return (
-    <ThemeProvider theme={getTheme(mode)}>
+    <ThemeProvider theme={getTheme(mode, systemMode)}>
       <CssBaseline />
       <Router>
         <div
