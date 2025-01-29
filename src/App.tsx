@@ -10,6 +10,7 @@ import MainPage from "./pages/MainPage";
 import theme from "./theme.js";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import LoginPage from "./pages/loginPage/LoginPage.js";
+import AboutMoviePage from "./pages/aboutMovie/AboutMoviePage.js";
 
 export const role: "admin" | "user" = "user"; //for demo
 
@@ -35,7 +36,7 @@ function App() {
                 {/*Home page for user*/}
                 <Route path="/schedule" element={<div />} />
                 {/*Session schedule page for user*/}
-                <Route path="/movie/:id" element={<div />} />
+                <Route path="/movie/:id" element={<AboutMoviePage />} />
                 {/*Movie details page*/}
                 <Route path="/session/:id" element={<div />} />
                 {/*Session detsils page for user*/}
