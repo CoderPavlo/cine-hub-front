@@ -1,8 +1,6 @@
-import React from 'react'
-
-
 import { useTheme } from '@mui/material/styles';
 import { Card, CardContent, CardHeader, Typography, alpha } from '@mui/material';
+import { ReactNode } from 'react';
 
 interface IMainCardProps{
     border: boolean,
@@ -11,13 +9,13 @@ interface IMainCardProps{
   darkTitle?: boolean,
   divider?: boolean,
   elevation: number,
-  secondary?: React.ReactNode,
+  secondary?: ReactNode,
   shadow?: string,
   sx?: object,
-  title?: string | React.ReactNode,
+  title?: string | ReactNode,
   codeHighlight?: boolean,
   content: boolean,
-  children: React.ReactNode
+  children: ReactNode
 }
 
 const headerSX = {

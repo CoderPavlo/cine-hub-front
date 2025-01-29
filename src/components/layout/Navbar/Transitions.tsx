@@ -1,4 +1,3 @@
-import React from 'react'
 import { forwardRef } from 'react';
 
 import { Fade, Box, Grow } from '@mui/material';

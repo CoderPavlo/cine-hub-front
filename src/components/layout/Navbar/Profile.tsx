@@ -4,7 +4,6 @@ import {
     Button,
 } from '@mui/material'
 import Grid from '@mui/material/Grid2';
-import React from 'react'
 import { useTheme } from '@mui/material/styles';
 import Transitions from './Transitions';
 import MainCard from './MainCard';
@@ -12,9 +11,10 @@ import MainCard from './MainCard';
 import { Login, Logout, Person, Settings } from '@mui/icons-material';
 import ProfileTab from './ProfileTab.tsx';
 import SettingsTab from './SettingsTab.tsx';
+import { ReactNode, useState } from 'react';
 
 interface ITabPanelProps {
-    children: React.ReactNode,
+    children: ReactNode,
     index: number,
     value: number,
 };
@@ -36,11 +36,11 @@ function a11yProps(index: number) {
 }
 
 export default function Profile() {
-    const [open, setOpen] = React.useState<boolean>(false);
-    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    const [open, setOpen] = useState<boolean>(false);
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const theme = useTheme();
     const isLogged = true; //for demo
-    const [value, setValue] = React.useState<number>(isLogged ? 0 : 1);
+    const [value, setValue] = useState<number>(isLogged ? 0 : 1);
 
 
     return (

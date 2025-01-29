@@ -1,6 +1,6 @@
 import { Menu, Slideshow } from "@mui/icons-material";
 import { AppBar, Toolbar, Typography, Button, Box, Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemText, ButtonBase, useTheme } from "@mui/material";
-import React from "react";
+import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { role } from "../../../App";
 import Notifications from "./Notifications";
@@ -28,7 +28,7 @@ export default function Navbar() {
     return null;
   }
   const isLogged = true;
-  const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleDrawerToggle = () => {
     setMobileOpen((prevState) => !prevState);

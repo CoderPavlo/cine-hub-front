@@ -24,9 +24,10 @@ function App() {
       <Router>
         <div
           style={{
-            minHeight: "100hv",
+            minHeight: "100vh",
             display: "flex",
             flexDirection: "column",
+            paddingTop: '64px',
           }}
         >
           <Navbar />

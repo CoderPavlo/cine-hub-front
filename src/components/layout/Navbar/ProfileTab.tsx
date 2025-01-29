@@ -1,4 +1,3 @@
-import React from 'react'
 import { Edit, Inbox, Logout, Wallet, } from '@mui/icons-material';
 import { List, ListItemButton, ListItemIcon, ListItemText, SvgIconTypeMap } from '@mui/material';
 import { OverridableComponent } from '@mui/material/OverridableComponent';

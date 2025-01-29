@@ -1,4 +1,3 @@
-import React from 'react'
 import {
     ToggleButton,
     List,
@@ -15,7 +14,7 @@ import { useAppDispatch, useAppSelector } from '../../../hooks/storeHooks';
 import { setMode, TMode } from '../../../store/slices/theme';
 import { IListEl } from './ProfileTab';
 import { useNavigate } from 'react-router-dom';
-
+import { useState } from "react";
 interface StyledToggleButtonGroupProps {
     value: any,
     onChange: (event: React.MouseEvent<HTMLElement, MouseEvent>, value: any) => void,
@@ -65,7 +64,7 @@ const list: IListEl[] = [
 export default function SettingsTab() {
     const { mode } = useAppSelector(state => state.themeReducer);
     const navigate = useNavigate();
-    const [collapse, setCollapse] = React.useState(false);
+    const [collapse, setCollapse] = useState(false);
     const dispath = useAppDispatch();
     return (
         <List component="nav" sx={{ p: 0, '& .MuiListItemIcon-root': { minWidth: 32, } }}>

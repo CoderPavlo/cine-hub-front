@@ -1,4 +1,3 @@
-import React from 'react'
 import { useTheme } from '@mui/material/styles';
 import {
     Avatar,
@@ -19,10 +18,11 @@ import {
     SvgIconTypeMap
 } from '@mui/material';
 
-import { Autorenew, CloseOutlined, ConfirmationNumber, MessageOutlined, Movie, Notifications as NotificationsIcon, Settings, } from '@mui/icons-material';
+import { Autorenew, CloseOutlined, ConfirmationNumber, Movie, Notifications as NotificationsIcon} from '@mui/icons-material';
 import MainCard from './MainCard.tsx';
 import Transitions from './Transitions.tsx';
 import { OverridableComponent } from '@mui/material/OverridableComponent';
+import { useState } from 'react';
 
 const avatarSX = {
     width: 36,
@@ -81,8 +81,8 @@ export default function Notifications() {
 
     const theme = useTheme();
     const matchesXs = useMediaQuery(theme.breakpoints.down('md'));
-    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
-    const [open, setOpen] = React.useState(false);
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const [open, setOpen] = useState(false);
     const handleToggle = () => {
         setOpen((prevOpen) => !prevOpen);
     };
