@@ -1,21 +1,22 @@
 import { useState } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import { Button, Box } from "@mui/material";
+import { Button, Box, InputAdornment, TextField, useTheme, FormControlLabel, Checkbox } from "@mui/material";
 
 import PasswordInput from "./PasswordInput";
 import EmailInput from "./EmailInput";
+import { AlternateEmail } from "@mui/icons-material";
 
 export default function LoginForm() {
   const [error, setError] = useState(null);
 
   const validationSchema = yup.object({
     email: yup
-      .string("Enter your email")
+      .string()
       .email("Enter a valid email")
       .required("Email is required"),
     password: yup
-      .string("Enter your password")
+      .string()
       .min(6, "Password should be of minimum 6 characters length")
       .required("Password is required"),
   });
@@ -32,9 +33,11 @@ export default function LoginForm() {
       console.log("Login USER Values:", values);
     },
   });
-
+  const theme=useTheme();
   return (
-    <form onSubmit={formik.handleSubmit} className="form">
+    <form onSubmit={formik.handleSubmit} className="form" style={{
+      background: theme.palette.background.paper,
+    }}>
       <EmailInput
         email={formik.values.email}
         handleEmail={formik.handleChange}
@@ -51,17 +54,9 @@ export default function LoginForm() {
         helperText={formik.touched.password && formik.errors.password}
       />
 
-      <label>
-        <input
-          type="checkbox"
-          name="rememberMe"
-          checked={formik.values.rememberMe}
-          onChange={formik.handleChange}
-        />
-        Remember Me
-      </label>
+      <FormControlLabel control={<Checkbox name="rememberMe" value={formik.values.rememberMe} onChange={formik.handleChange}/>} label="Remember Me" />
 
-      {error && <Box sx={{ color: "red" }}>{error}</Box>}
+      {error && <Box color='error'>{error}</Box>}
 
       <Button color="primary" variant="contained" fullWidth type="submit">
         Submit

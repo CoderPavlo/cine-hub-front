@@ -10,6 +10,7 @@ import {
   Select,
   FormHelperText,
   Box,
+  useTheme,
 } from "@mui/material";
 import PasswordInput from "./PasswordInput";
 import EmailInput from "./EmailInput";
@@ -21,11 +22,11 @@ export default function SignUpForm() {
 
   const validationSchema = yup.object({
     email: yup
-      .string("Enter your email")
+      .string()
       .email("Enter a valid email")
       .required("Email is required"),
     password: yup
-      .string("Enter your password")
+      .string()
       .min(6, "Password should be of minimum 6 characters length")
       .required("Password is required"),
     name: yup.string().required("First name is required"),
@@ -49,9 +50,11 @@ export default function SignUpForm() {
       console.log("SignUp User values:", values);
     },
   });
-
+  const theme = useTheme();
   return (
-    <form onSubmit={formik.handleSubmit} className="form">
+    <form onSubmit={formik.handleSubmit} className="form" style={{
+      background: theme.palette.background.paper,
+    }}>
       <Box sx={{ display: "flex", gap: "20px" }}>
         <TextField
           fullWidth
@@ -102,12 +105,13 @@ export default function SignUpForm() {
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
             error={formik.touched.gender && Boolean(formik.errors.gender)}
+            
           >
             <MenuItem value={"male"}>Male</MenuItem>
             <MenuItem value={"female"}>Female</MenuItem>
           </Select>
 
-          <FormHelperText style={{ color: "red" }}>
+          <FormHelperText color='error'>
             {formik.touched.gender && formik.errors.gender}
           </FormHelperText>
         </FormControl>
@@ -127,7 +131,7 @@ export default function SignUpForm() {
         error={formik.touched.password && Boolean(formik.errors.password)}
         helperText={formik.touched.password && formik.errors.password}
       />
-      {error && <Box sx={{ color: "red" }}>{error}</Box>}
+      {error && <Box color='error'>{error}</Box>}
       <Button color="primary" variant="contained" fullWidth type="submit">
         Submit
       </Button>
