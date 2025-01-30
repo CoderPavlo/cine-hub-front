@@ -27,13 +27,12 @@ const darkPalette: PaletteOptions = {
     text: { primary: '#ffffff', secondary: '#b8e2f2' },
 };
 
-type TMode = 'dark' | 'light' | 'system';
-export const getTheme = (mode: TMode): Theme => {
+export type TMode = 'dark' | 'light' | 'system';
+
+export const getTheme = (mode: TMode, systemMode: TMode): Theme => {
     const prefersMode =
         mode === 'system'
-            ? useMediaQuery('(prefers-color-scheme: dark)')
-                ? 'dark'
-                : 'light'
+            ? systemMode
             : mode;
     return createTheme({
         palette: prefersMode === 'dark' ? darkPalette : lightPalette,
@@ -52,5 +51,5 @@ export const themeSlice = createSlice({
         },
     },
 });
-
+export const { setMode } = themeSlice.actions;
 export default themeSlice.reducer;
