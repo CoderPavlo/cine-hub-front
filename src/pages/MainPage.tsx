@@ -13,31 +13,30 @@ interface Movie {
 
 const MainPage: React.FC = () => {
   const navigate = useNavigate();
+  const [movies, setMovies] = useState<Movie[]>([]);
 
-  //(replace this with API data when available)
-  const placeholderMovies: Movie[] = [
-    {
-      id: 1,
-      name: "Movie Title 1",
-      posterUrl: "https://via.placeholder.com/150",
-      description: "This is a placeholder description for Movie Title 1.",
-      ratings: 8.5,
-    },
-    {
-      id: 2,
-      name: "Movie Title 2",
-      posterUrl: "https://via.placeholder.com/150",
-      description: "This is a placeholder description for Movie Title 2.",
-      ratings: 7.8,
-    },
-    {
-      id: 3,
-      name: "Movie Title 3",
-      posterUrl: "https://via.placeholder.com/150",
-      description: "This is a placeholder description for Movie Title 3.",
-      ratings: 9.1,
-    },
-  ];
+  useEffect(() => {
+    const fetchMovies = async () => {
+      try {
+        const response = await fetch(
+          `https://api.themoviedb.org/3/movie/popular?api_key=0342f04e0e2b5df87c3a3392fe93fec7&language=en-US&page=1`
+        );
+        const data = await response.json();
+        const formattedMovies = data.results.map((movie: any) => ({
+          id: movie.id,
+          name: movie.title,
+          posterUrl: `https://image.tmdb.org/t/p/w500${movie.poster_path}`,
+          description: movie.overview,
+          ratings: movie.vote_average,
+        }));
+        setMovies(formattedMovies);
+      } catch (error) {
+        console.error("Error fetching movies:", error);
+      }
+    };
+
+    fetchMovies();
+  }, []);
 
   const handleMovieClick = (id: number) => {
     navigate(`/movies/${id}`);
@@ -77,16 +76,16 @@ const MainPage: React.FC = () => {
           Recommended Movies
         </Typography>
         <Grid container spacing={4}>
-          {placeholderMovies.map((movie) => (
+          {movies.map((movie) => (
             <Grid item xs={12} sm={6} md={4} key={movie.id}>
-              <Card sx={{ boxShadow: 3, cursor: "pointer" }} onClick={() => handleMovieClick(movie.id)}>
+              <Card sx={{ boxShadow: 3, cursor: "pointer", display: "flex", flexDirection: "column", height: "100%" }} onClick={() => handleMovieClick(movie.id)}>
                 <CardMedia
                   component="img"
-                  height="200"
                   image={movie.posterUrl}
                   alt={movie.name}
+                  sx={{ aspectRatio: "2/3", objectFit: "cover" }}
                 />
-                <CardContent>
+                <CardContent sx={{ flexGrow: 1 }}>
                   <Typography variant="h6" gutterBottom>
                     {movie.name}
                   </Typography>
@@ -94,7 +93,7 @@ const MainPage: React.FC = () => {
                     {movie.description}
                   </Typography>
                   <Typography variant="body1" color="primary">
-                    Rating: {movie.ratings}
+                    Rating: {movie.ratings.toFixed(1)}
                   </Typography>
                 </CardContent>
               </Card>
