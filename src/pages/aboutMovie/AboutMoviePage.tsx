@@ -6,6 +6,8 @@ import {
   API_KEY,
   BASE_IMG_URL,
 } from "../../helpers/apiConfig.js";
+import { Box, CircularProgress } from "@mui/material";
+import CastCarousel from "../../components/CastCarousel.js";
 
 // Movie id of Heretic 1138194
 function AboutMoviePage() {
@@ -13,25 +15,11 @@ function AboutMoviePage() {
   const [movieData, setMovieData] = useState(null);
   const [trailerKey, setTrailerKey] = useState(null);
   const [cast, setCast] = useState(null);
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [crew, setCrew] = useState(null);
+  const [trailerErrorMessage, setTrailerErrorMessage] = useState(null);
+  const [castErrorMessage, setCastErrorMessage] = useState(null);
 
   useEffect(() => {
-    // const getTrailer = async (movieID) => {
-    //   const url = `${API_BASE_URL}movie/${movieID}/videos?language=en-US&api_key=${API_KEY}`;
-    //   try {
-    //     const response = await fetch(url);
-    //     const data = await response.json();
-
-    //     if (data.results && data.results.length > 0) {
-    //       setTrailerKey(data.results[0].key);
-    //     } else {
-    //       setErrorMessage("Unable to load trailer for this movie :/");
-    //     }
-    //   } catch (error) {
-    //     setErrorMessage("An error occurred while fetching the trailer.");
-    //   }
-    // };
-
     // Loading movie main info
     fetch(`${API_BASE_URL}movie/${movieId}?language=en-US&api_key=${API_KEY}`)
       .then((response) => response.json())
@@ -44,59 +32,54 @@ function AboutMoviePage() {
     )
       .then((response) => response.json())
       .then((data) => {
-        console.log("Trailer Data:");
-        console.log(data);
-
         if (data.results && data.results.length > 0) {
           setTrailerKey(data.results[0].key);
         } else {
-          setErrorMessage(
-            "We were unable to find a video preview for this movie :/"
-          );
+          setTrailerErrorMessage("No video preview found for this movie :/");
         }
       })
       .catch((error) =>
         console.error("An error occurred while fetching the trailer:", error)
       );
 
+    // Loading cast and film crew
     fetch(`${API_BASE_URL}movie/${movieId}/credits?api_key=${API_KEY}`)
       .then((response) => response.json())
       .then((data) => {
-        console.log("Cast Data:");
-        console.log(data);
-
         if (data.cast && data.cast.length > 0) {
           setCast(data.cast);
         } else {
-          setErrorMessage("No cast found for this movie :/");
+          setCastErrorMessage("No cast found for this movie :/");
+        }
+
+        if (data.crew && data.crew.length > 0) {
+          setCrew(data.crew);
         }
       })
       .catch((error) =>
-        console.error("An error occurred while fetching the cast:", error)
+        console.error("An error occurred while fetching cast and crew:", error)
       );
   }, [movieId]);
 
   if (!movieData) {
     return (
-      <div style={{ fontSize: "40px", color: "white", backgroundColor: "red" }}>
-        Loading...
-      </div>
+      <Box
+        sx={{
+          display: "flex",
+          position: "absolute",
+          height: "100vh",
+          width: "100vw",
+          zIndex: "999",
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <CircularProgress size="60px" />
+      </Box>
     );
   }
-  console.log(movieData);
-  console.log(`${BASE_IMG_URL}original/${movieData.backdrop_path}`);
 
-  //   $("#movie-name").text(response.original_title);
-  //       $("#movie-status").text(response.status);
-  //       $("#movie-summary").text(response.overview);
-  //       $("#movie-poster")
-  //         .attr("src", imgURL)
-  //         .attr("alt", response.original_title);
-  //       $("#movie-rating").text(response.vote_average);
-  //       $("#movie-release").text(response.release_date.substring(0, 4));
-  //       response.runtime !== null
-  //         ? $("#movie-runtime").text(response.runtime + " mins")
-  //         : "";
+  console.log(movieData);
 
   return (
     <div>
@@ -105,7 +88,11 @@ function AboutMoviePage() {
           <div className="movie-photo-container">
             <img
               className="movie-poster"
-              src={`${BASE_IMG_URL}original/${movieData.poster_path}`}
+              src={
+                movieData.poster_path
+                  ? `${BASE_IMG_URL}original/${movieData.poster_path}`
+                  : "/no-picture-available.png"
+              }
               alt={movieData.original_title}
             />
           </div>
@@ -122,11 +109,20 @@ function AboutMoviePage() {
               <p className="val">{movieData.release_date || "N/A"}</p>
             </div>
             <div>
+              <p className="key">Director:</p>
+              <p className="val">
+                {crew
+                  ? crew
+                      .filter((person) => person.job === "Director")
+                      .map((dir) => dir.name)
+                      .join(", ")
+                  : "N/A"}
+              </p>
+            </div>
+            <div>
               <p className="key">Duration:</p>
               <p className="val">
-                {movieData.runtime !== null
-                  ? `${movieData.runtime} minutes`
-                  : "N/A"}
+                {movieData.runtime ? `${movieData.runtime} minutes` : "N/A"}
               </p>
             </div>
             <div>
@@ -138,9 +134,11 @@ function AboutMoviePage() {
               </p>
             </div>
           </div>
-          <p>{movieData.overview || "No description available."}</p>
+          <p>
+            {movieData.overview || "No description found for this movie :/"}
+          </p>
 
-          <p>Watch trailer:</p>
+          <p>Watch Trailer</p>
           {trailerKey ? (
             <div className="iframe-container">
               <iframe
@@ -149,10 +147,51 @@ function AboutMoviePage() {
                 title="Movie Trailer"
               ></iframe>
             </div>
-          ) : errorMessage ? (
-            <p className="lead">{errorMessage}</p>
+          ) : trailerErrorMessage ? (
+            <p className="lead">{trailerErrorMessage}</p>
           ) : (
-            <p>Loading...</p>
+            <Box
+              sx={{
+                paddingTop: "56.25%",
+                position: "relative",
+              }}
+            >
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                }}
+              >
+                <CircularProgress size="40px" />
+              </Box>
+            </Box>
+          )}
+
+          <div>Cast</div>
+          {cast ? (
+            <CastCarousel cast={cast} />
+          ) : castErrorMessage ? (
+            <p className="lead">{castErrorMessage}</p>
+          ) : (
+            <Box
+              sx={{
+                paddingTop: "56.25%",
+                position: "relative",
+              }}
+            >
+              <Box
+                sx={{
+                  position: "absolute",
+                  top: "50%",
+                  left: "50%",
+                  transform: "translate(-50%, -50%)",
+                }}
+              >
+                <CircularProgress size="40px" />
+              </Box>
+            </Box>
           )}
         </div>
         <div className="movie-sessions-section">movie-sessions-section</div>

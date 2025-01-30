@@ -100,3 +100,30 @@ body {
   border-radius: 6px;
   border: 0;
 }
+
+.slick-prev {
+  left: -15px !important;
+}
+
+.slick-prev,
+.slick-next {
+  transition: all 0.3s ease !important;
+}
+
+.slick-prev:hover,
+.slick-prev:focus,
+.slick-next:hover,
+.slick-next:focus {
+  color: #b02e2f !important;
+  opacity: 1;
+}
+
+.slick-prev.slick-disabled,
+.slick-next.slick-disabled {
+  cursor: not-allowed !important;
+}
+
+.slick-prev.slick-disabled,
+.slick-next.slick-disabled:hover {
+  opacity: 0.6;
+}
