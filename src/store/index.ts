@@ -1,14 +1,16 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import themeReducer from "./slices/theme";
+import { themoviedbAPI } from "./api/themoviedb";
 const rootReducer = combineReducers({
     themeReducer,
+    [themoviedbAPI.reducerPath]: themoviedbAPI.reducer,
 })
 
 export const setupStore = () => {
     return configureStore({
         reducer: rootReducer,
         middleware: (getDefaultMiddleware) =>
-            getDefaultMiddleware().concat()
+            getDefaultMiddleware().concat(themoviedbAPI.middleware)
     })
 }
 
