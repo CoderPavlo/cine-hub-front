@@ -1,6 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Container, Typography, Box, Button, Card, CardContent, Grid, CardMedia } from "@mui/material";
+import {
+  Container,
+  Typography,
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Grid,
+  CardMedia,
+} from "@mui/material";
 import { PlayCircleOutline } from "@mui/icons-material";
 
 interface Movie {
@@ -48,9 +57,10 @@ const MainPage: React.FC = () => {
         Welcome to CinemaHub
       </Typography>
       <Typography variant="h6" color="text.secondary" paragraph>
-        Experience the latest movies with the best quality and comfort. Book your tickets online and enjoy exclusive screenings!
+        Experience the latest movies with the best quality and comfort. Book
+        your tickets online and enjoy exclusive screenings!
       </Typography>
-      
+
       <Box mt={4}>
         <Card sx={{ p: 3, boxShadow: 3 }}>
           <CardContent>
@@ -58,12 +68,18 @@ const MainPage: React.FC = () => {
               Discover Our Features
             </Typography>
             <Typography variant="body1" color="text.secondary">
-              - Easy online booking system<br/>
-              - Comfortable seats & premium sound experience<br/>
-              - Special discounts for members
+              - Easy online booking system
+              <br />
+              - Comfortable seats & premium sound experience
+              <br />- Special discounts for members
             </Typography>
             <Box mt={3}>
-              <Button variant="contained" color="primary" size="large" startIcon={<PlayCircleOutline />}> 
+              <Button
+                variant="contained"
+                color="primary"
+                size="large"
+                startIcon={<PlayCircleOutline />}
+              >
                 Browse Movies
               </Button>
             </Box>
@@ -78,7 +94,16 @@ const MainPage: React.FC = () => {
         <Grid container spacing={4}>
           {movies.map((movie) => (
             <Grid item xs={12} sm={6} md={4} key={movie.id}>
-              <Card sx={{ boxShadow: 3, cursor: "pointer", display: "flex", flexDirection: "column", height: "100%" }} onClick={() => handleMovieClick(movie.id)}>
+              <Card
+                sx={{
+                  boxShadow: 3,
+                  cursor: "pointer",
+                  display: "flex",
+                  flexDirection: "column",
+                  height: "100%",
+                }}
+                onClick={() => handleMovieClick(movie.id)}
+              >
                 <CardMedia
                   component="img"
                   image={movie.posterUrl}
