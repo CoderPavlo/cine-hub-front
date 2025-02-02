@@ -4,8 +4,6 @@ import SwitchSelector from "react-switch-selector";
 import SignUpForm from "../../components/auth/SignUpForm";
 import LoginForm from "../../components/auth/LoginForm";
 import "./Login.css";
-import SignUpForm from "../../components/auth/SignUpForm";
-import LoginForm from "../../components/auth/LoginForm";
 
 function LoginPage() {
   const [checked, setChecked] = useState(false);

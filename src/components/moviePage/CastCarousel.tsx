@@ -1,21 +1,46 @@
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import CustomActorCard from "./CustomActorCard";
-import { BASE_IMG_URL } from "../helpers/apiConfig.js";
+import ActorCard from "./ActorCard.js";
+import { BASE_IMG_URL } from "../../helpers/apiConfig.ts";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
-import { useState } from "react";
+import { Box } from "@mui/material";
 
-export default function SimpleSlider({ cast }) {
-  console.log("Cast props:", cast);
+export interface Actor {
+  id: number;
+  profile_path: string | null;
+  name: string;
+  character: string;
+}
 
+interface CastCarouselProps {
+  cast: Actor[];
+}
+
+const CastCarousel: React.FC<CastCarouselProps> = ({ cast }) => {
   var settings = {
-    dots: true,
+    dots: cast.length < 10 ? true : false,
     infinite: false,
-    // speed: 500,
     slidesToShow: 3,
     slidesToScroll: 3,
+    responsive: [
+      {
+        breakpoint: 1399,
+        settings: {
+          slidesToShow: 2,
+          slidesToScroll: 2,
+        },
+      },
+      {
+        breakpoint: 600,
+        settings: {
+          slidesToShow: 1,
+          slidesToScroll: 1,
+          dots: false,
+        },
+      },
+    ],
     nextArrow: (
       <ArrowForwardIosIcon
         color="primary"
@@ -32,10 +57,15 @@ export default function SimpleSlider({ cast }) {
     ),
   };
   return (
-    <div className="slider-container">
+    <Box
+      sx={{
+        maxWidth: { xs: "80%", lg: "100%" },
+        alignSelf: "center",
+      }}
+    >
       <Slider {...settings}>
         {cast.map((actor) => (
-          <CustomActorCard
+          <ActorCard
             key={actor.id}
             hasPhoto={actor.profile_path ? true : false}
             url={BASE_IMG_URL + "w342/" + actor.profile_path}
@@ -44,6 +74,7 @@ export default function SimpleSlider({ cast }) {
           />
         ))}
       </Slider>
-    </div>
+    </Box>
   );
-}
+};
+export default CastCarousel;

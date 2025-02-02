@@ -1,32 +1,64 @@
-import { useEffect, useState } from "react";
 import "./AboutMoviePage.scss";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import {
   API_BASE_URL,
   API_KEY,
   BASE_IMG_URL,
-} from "../../helpers/apiConfig.js";
-import { Box, CircularProgress } from "@mui/material";
-import CastCarousel from "../../components/CastCarousel.js";
+} from "../../helpers/apiConfig.ts";
+import {
+  Box,
+  CircularProgress,
+  Container,
+  Typography,
+  CardMedia,
+  Stack,
+  Paper,
+  Divider,
+  Grid2,
+} from "@mui/material";
+import CastCarousel from "../../components/moviePage/CastCarousel.js";
+import MovieSessions from "../../components/moviePage/MovieSessions.js";
 
-// Movie id of Heretic 1138194
-function AboutMoviePage() {
+// Ids of films: 1138194, 539972, 426063, 1249289, 970450, 1184918, 1064213, 993710, 970450
+
+const InfoItem = ({ label, value }: { label: string; value: string }) => (
+  <Box>
+    <Typography variant="caption" color="text.secondary">
+      {label}:
+    </Typography>
+    <Typography variant="body1" sx={{ color: "text.primary" }}>
+      {value}
+    </Typography>
+  </Box>
+);
+
+export default function AboutMoviePage() {
   const { id: movieId } = useParams();
-  const [movieData, setMovieData] = useState(null);
-  const [trailerKey, setTrailerKey] = useState(null);
-  const [cast, setCast] = useState(null);
-  const [crew, setCrew] = useState(null);
-  const [trailerErrorMessage, setTrailerErrorMessage] = useState(null);
-  const [castErrorMessage, setCastErrorMessage] = useState(null);
+  const [movieData, setMovieData] = useState<any>(null);
+  const [trailerKey, setTrailerKey] = useState<string | null>(null);
+  const [cast, setCast] = useState<any[] | null>(null);
+  const [crew, setCrew] = useState<any[] | null>(null);
+  const [trailerErrorMessage, setTrailerErrorMessage] = useState<string | null>(
+    null
+  );
+  const [castErrorMessage, setCastErrorMessage] = useState<string | null>(null);
+
+  function getMovieDuration(minutes: string) {
+    const m = parseInt(minutes);
+    const hours = Math.floor(m / 60);
+    const mins = m - hours * 60;
+    return `${hours}:${mins}`;
+  }
 
   useEffect(() => {
-    // Loading movie main info
+    // 1. Loading movie main info
     fetch(`${API_BASE_URL}movie/${movieId}?language=en-US&api_key=${API_KEY}`)
       .then((response) => response.json())
       .then((data) => setMovieData(data))
       .catch((error) => console.error("Failed to fetch movie data:", error));
 
-    // Loading trailer
+    // 2. Loading trailer
     fetch(
       `${API_BASE_URL}movie/${movieId}/videos?language=en-US&api_key=${API_KEY}`
     )
@@ -42,7 +74,7 @@ function AboutMoviePage() {
         console.error("An error occurred while fetching the trailer:", error)
       );
 
-    // Loading cast and film crew
+    // 3. Loading cast and film crew
     fetch(`${API_BASE_URL}movie/${movieId}/credits?api_key=${API_KEY}`)
       .then((response) => response.json())
       .then((data) => {
@@ -61,143 +93,326 @@ function AboutMoviePage() {
       );
   }, [movieId]);
 
+  movieData ? console.log(movieData) : "";
+
   if (!movieData) {
     return (
       <Box
         sx={{
           display: "flex",
-          position: "absolute",
           height: "100vh",
-          width: "100vw",
-          zIndex: "999",
           justifyContent: "center",
           alignItems: "center",
+          bgcolor: "background.default",
         }}
       >
-        <CircularProgress size="60px" />
+        <CircularProgress size={60} />
       </Box>
     );
   }
 
-  console.log(movieData);
-
   return (
-    <div>
-      <div className="movie-page-container">
-        <div className="movie-photo-section">
-          <div className="movie-photo-container">
-            <img
-              className="movie-poster"
-              src={
+    <Container
+      maxWidth="xl"
+      sx={{
+        paddingTop: "32px",
+        paddingBottom: "55px",
+        bgcolor: "background.default",
+      }}
+    >
+      {/* Movie Poster section */}
+      <Grid2 container spacing={{ xs: 6, lg: 8 }}>
+        <Grid2
+          size={{ xs: 12, lg: "auto" }}
+          sx={{
+            width: { xs: "100%", lg: "250px" },
+            order: { xs: 1, lg: 1 },
+          }}
+        >
+          <Box
+            sx={{
+              position: { xs: "relative", lg: "sticky" },
+              top: { xs: 0, lg: 88 },
+              maxHeight: { xs: "65vh", lg: "auto" },
+              background: { xs: "rgba(0, 0, 0)", lg: "none" },
+              borderRadius: 2,
+            }}
+          >
+            <CardMedia
+              component="img"
+              image={
                 movieData.poster_path
                   ? `${BASE_IMG_URL}original/${movieData.poster_path}`
                   : "/no-picture-available.png"
               }
               alt={movieData.original_title}
+              sx={{
+                borderRadius: 2,
+                height: { xs: "100%", lg: "auto" },
+                objectFit: "contain",
+                maxHeight: "65vh",
+              }}
             />
-          </div>
-        </div>
-        <div className="movie-details-section">
-          <h1>{movieData.title}</h1>
-          <div className="movie-main-info-container">
-            <div>
-              <p className="key">iMDB Rating:</p>
-              <p className="val">{movieData.vote_average || "N/A"}</p>
-            </div>
-            <div>
-              <p className="key">Release Date:</p>
-              <p className="val">{movieData.release_date || "N/A"}</p>
-            </div>
-            <div>
-              <p className="key">Director:</p>
-              <p className="val">
-                {crew
-                  ? crew
-                      .filter((person) => person.job === "Director")
-                      .map((dir) => dir.name)
-                      .join(", ")
-                  : "N/A"}
-              </p>
-            </div>
-            <div>
-              <p className="key">Duration:</p>
-              <p className="val">
-                {movieData.runtime ? `${movieData.runtime} minutes` : "N/A"}
-              </p>
-            </div>
-            <div>
-              <p className="key">Genres:</p>
-              <p className="val">
-                {movieData.genres
-                  ? movieData.genres.map((genre) => genre.name).join(", ")
-                  : "N/A"}
-              </p>
-            </div>
-          </div>
-          <p>
-            {movieData.overview || "No description found for this movie :/"}
-          </p>
+          </Box>
+          <Typography
+            variant="h3"
+            sx={{
+              color: "primary.main",
+              fontWeight: 700,
+              textAlign: "center",
+              my: 2,
+              display: { xs: "block", lg: "none" },
+            }}
+          >
+            {movieData.title}
+          </Typography>
+          <Divider
+            sx={{
+              display: { xs: "block", lg: "none" },
+            }}
+          />
+        </Grid2>
 
-          <p>Watch Trailer</p>
-          {trailerKey ? (
-            <div className="iframe-container">
-              <iframe
-                src={`https://www.youtube-nocookie.com/embed/${trailerKey}`}
-                allowFullScreen
-                title="Movie Trailer"
-              ></iframe>
-            </div>
-          ) : trailerErrorMessage ? (
-            <p className="lead">{trailerErrorMessage}</p>
-          ) : (
-            <Box
+        {/* Movie Details section */}
+        <Grid2 size={{ xs: 12, lg: "grow" }} sx={{ order: { xs: 3, lg: 2 } }}>
+          <Typography
+            variant="h3"
+            sx={{
+              color: "primary.main",
+              fontWeight: 700,
+              mb: 2,
+              display: { xs: "none", lg: "block" },
+            }}
+          >
+            {movieData.title}
+          </Typography>
+
+          <Divider />
+
+          {/* Short Info About Movie */}
+          <Stack spacing={2} sx={{ mb: 3 }}>
+            <Grid2 container spacing={0}>
+              <Grid2
+                size={{ xs: 6, lg: 4 }}
+                sx={{ padding: "16px 16px 0 0 !important" }}
+              >
+                <InfoItem
+                  label="iMDB Rating"
+                  value={movieData.vote_average || "N/A"}
+                />
+              </Grid2>
+              <Grid2
+                size={{ xs: 6, lg: 4 }}
+                sx={{ padding: "16px 16px 0 0 !important" }}
+              >
+                <InfoItem
+                  label="Release Date"
+                  value={
+                    `${movieData.release_date.slice(
+                      -2
+                    )}.${movieData.release_date.slice(
+                      -5,
+                      -3
+                    )}.${movieData.release_date.slice(0, 4)}` || "N/A"
+                  }
+                />
+              </Grid2>
+              <Grid2
+                size={{ xs: 6, lg: 4 }}
+                sx={{ padding: "16px 16px 0 0 !important" }}
+              >
+                <InfoItem
+                  label="Director"
+                  value={
+                    crew
+                      ? crew
+                          .filter((p) => p.job === "Director")
+                          .map((d) => d.name)
+                          .join(", ")
+                      : "N/A"
+                  }
+                />
+              </Grid2>
+              <Grid2
+                size={{ xs: 6, lg: 4 }}
+                sx={{ padding: "16px 16px 0 0 !important" }}
+              >
+                <InfoItem
+                  label="Duration"
+                  value={
+                    movieData.runtime
+                      ? getMovieDuration(movieData.runtime)
+                      : "N/A"
+                  }
+                />
+              </Grid2>
+              <Grid2
+                size={{ xs: 6, lg: 4 }}
+                sx={{ padding: "16px 16px 0 0 !important" }}
+              >
+                <InfoItem
+                  label="Genres"
+                  value={
+                    movieData.genres?.map((g: any) => g.name).join(", ") ||
+                    "N/A"
+                  }
+                />
+              </Grid2>
+              <Grid2
+                size={{ xs: 6, lg: 4 }}
+                sx={{ padding: "16px 16px 0 0 !important" }}
+              >
+                <InfoItem
+                  label="Production country"
+                  value={
+                    movieData.production_countries
+                      ?.map((g: any) => g.name)
+                      .join(", ") || "N/A"
+                  }
+                />
+              </Grid2>
+            </Grid2>
+
+            <Divider />
+
+            {movieData.overview ? (
+              <Typography
+                variant="body1"
+                sx={{ color: "text.primary", textAlign: "justify" }}
+              >
+                {movieData.overview}
+              </Typography>
+            ) : (
+              <Typography variant="body1" color="error">
+                No description found for this movie :/
+              </Typography>
+            )}
+
+            <Divider />
+
+            <Typography
+              variant="h5"
               sx={{
-                paddingTop: "56.25%",
-                position: "relative",
+                color: "text.primary",
+                fontWeight: 600,
+                textAlign: { xs: "center", lg: "start" },
               }}
             >
+              Watch Trailer
+            </Typography>
+
+            {/* Movie`s Trailer */}
+            {trailerKey ? (
               <Box
                 sx={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
+                  position: "relative",
+                  width: "100%",
+                  maxWidth: "800px",
+                  aspectRatio: "16/9",
+                  borderRadius: 2,
+                  overflow: "hidden",
+                  alignSelf: "center",
                 }}
               >
-                <CircularProgress size="40px" />
+                <iframe
+                  src={`https://www.youtube-nocookie.com/embed/${trailerKey}`}
+                  allowFullScreen
+                  title="Movie Trailer"
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    width: "100%",
+                    height: "100%",
+                    border: 0,
+                  }}
+                />
               </Box>
-            </Box>
-          )}
+            ) : trailerErrorMessage ? (
+              <Typography color="error">{trailerErrorMessage}</Typography>
+            ) : (
+              <Box sx={{ pt: "56.25%", position: "relative" }}>
+                <CircularProgress
+                  size={40}
+                  sx={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    color: "primary.main",
+                  }}
+                />
+              </Box>
+            )}
 
-          <div>Cast</div>
-          {cast ? (
-            <CastCarousel cast={cast} />
-          ) : castErrorMessage ? (
-            <p className="lead">{castErrorMessage}</p>
-          ) : (
-            <Box
+            <Divider />
+
+            <Typography
+              variant="h5"
               sx={{
-                paddingTop: "56.25%",
-                position: "relative",
+                color: "text.primary",
+                fontWeight: 600,
+                textAlign: { xs: "center", lg: "start" },
               }}
             >
-              <Box
-                sx={{
-                  position: "absolute",
-                  top: "50%",
-                  left: "50%",
-                  transform: "translate(-50%, -50%)",
-                }}
-              >
-                <CircularProgress size="40px" />
+              Cast
+            </Typography>
+
+            {/* Movie`s Actors */}
+            {cast ? (
+              <CastCarousel cast={cast} />
+            ) : castErrorMessage ? (
+              <Typography color="error">{castErrorMessage}</Typography>
+            ) : (
+              <Box sx={{ height: 200, position: "relative" }}>
+                <CircularProgress
+                  size={40}
+                  sx={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                    color: "primary.main",
+                  }}
+                />
               </Box>
+            )}
+          </Stack>
+        </Grid2>
+
+        {/* Movie Sessions Section */}
+        <Grid2
+          size={{ xs: 12, lg: "auto" }}
+          sx={{
+            width: { xs: "100%", lg: "375px", maxWidth: "800px" },
+            order: { xs: 2, lg: 3 },
+            mx: "auto",
+          }}
+        >
+          <Paper
+            sx={{
+              p: 2,
+              position: { xs: "relative", lg: "sticky" },
+              top: { xs: "auto", lg: 88 },
+              bgcolor: "background.paper",
+              borderRadius: 2,
+              boxShadow: 3,
+              maxHeight: { xs: "auto", lg: "calc(100vh - 180px)" },
+            }}
+          >
+            <Typography
+              variant="h6"
+              gutterBottom
+              sx={{ color: "primary.main", fontWeight: 600 }}
+            >
+              Schedule of sessions
+            </Typography>
+            <Box sx={{ p: 2, bgcolor: "background.default", borderRadius: 2 }}>
+              <MovieSessions />
             </Box>
-          )}
-        </div>
-        <div className="movie-sessions-section">movie-sessions-section</div>
-      </div>
-    </div>
+          </Paper>
+        </Grid2>
+      </Grid2>
+    </Container>
   );
 }
-
-export default AboutMoviePage;
