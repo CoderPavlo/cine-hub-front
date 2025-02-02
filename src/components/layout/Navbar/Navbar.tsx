@@ -52,7 +52,7 @@ export default function Navbar() {
   return (
     <>
       <AppBar component="nav" color="primary" sx={{ background: theme.palette.primary.main }}>
-        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
+        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between', maxWidth: "lg", mx: 'auto', width: '100%' }}>
           <IconButton
             aria-label="open drawer"
             edge="start"

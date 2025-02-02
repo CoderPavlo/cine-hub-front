@@ -11,6 +11,7 @@ import { CssBaseline, ThemeProvider, useMediaQuery } from "@mui/material";
 import LoginPage from "./pages/loginPage/LoginPage.tsx";
 import { useAppSelector } from "./hooks/storeHooks.ts";
 import { getTheme } from "./store/slices/theme.ts";
+import HomePage from "./pages/HomePage.tsx";
 
 export const role: "admin" | "user" = "user"; //for demo
 
@@ -36,7 +37,7 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             {role === "user" && (
               <>
-                <Route path="/home" element={<div />} />
+                <Route path="/home" element={<HomePage />} />
                 {/*Home page for user*/}
                 <Route path="/schedule" element={<div />} />
                 {/*Session schedule page for user*/}

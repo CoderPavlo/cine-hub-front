@@ -7,7 +7,7 @@ export const themoviedbAPI = createApi({
         baseUrl: 'https://api.themoviedb.org/3/',
     }),
     endpoints: (build) => ({
-        fetchGenres: build.query<Genre[], void>({
+        fetchGenres: build.query<{genres: Genre[]}, void>({
             query: () => ({
                 url: `genre/movie/list?api_key=${import.meta.env.VITE_THEMOVIEDB_APIKEY}&language=en-US`,
                 method: 'GET',
@@ -16,6 +16,12 @@ export const themoviedbAPI = createApi({
         fetchPopularMovies: build.query<GetRequest<Movie>, number>({
             query: (page) => ({
                 url: `movie/popular?api_key=${import.meta.env.VITE_THEMOVIEDB_APIKEY}&language=en-US&page=${page}`,
+                method: 'GET',
+            }),
+        }),
+        fetchNewMovies: build.query<GetRequest<Movie>, number>({
+            query: (page) => ({
+                url: `discover/movie?sort_by=popularity.desc&api_key=${import.meta.env.VITE_THEMOVIEDB_APIKEY}&language=en-US&page=${page}`,
                 method: 'GET',
             }),
         }),
