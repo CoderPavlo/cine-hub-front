@@ -11,13 +11,15 @@ import { CssBaseline, ThemeProvider, useMediaQuery } from "@mui/material";
 import LoginPage from "./pages/loginPage/LoginPage.tsx";
 import { useAppSelector } from "./hooks/storeHooks.ts";
 import { getTheme } from "./store/slices/theme.ts";
+import AboutMoviePage from "./pages/aboutMovie/AboutMoviePage.js";
 
 export const role: "admin" | "user" = "user"; //for demo
 
-
 function App() {
-  const {mode} = useAppSelector(state=>state.themeReducer); 
-  const systemMode = useMediaQuery('(prefers-color-scheme: dark)') ? 'dark' : 'light';
+  const { mode } = useAppSelector((state) => state.themeReducer);
+  const systemMode = useMediaQuery("(prefers-color-scheme: dark)")
+    ? "dark"
+    : "light";
   return (
     <ThemeProvider theme={getTheme(mode, systemMode)}>
       <CssBaseline />
@@ -27,7 +29,7 @@ function App() {
             minHeight: "100vh",
             display: "flex",
             flexDirection: "column",
-            paddingTop: '64px',
+            paddingTop: "64px",
           }}
         >
           <Navbar />
@@ -40,7 +42,7 @@ function App() {
                 {/*Home page for user*/}
                 <Route path="/schedule" element={<div />} />
                 {/*Session schedule page for user*/}
-                <Route path="/movie/:id" element={<div />} />
+                <Route path="/movie/:id" element={<AboutMoviePage />} />
                 {/*Movie details page*/}
                 <Route path="/session/:id" element={<div />} />
                 {/*Session detsils page for user*/}
