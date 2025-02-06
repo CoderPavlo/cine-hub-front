@@ -12,6 +12,7 @@ import LoginPage from "./pages/loginPage/LoginPage.tsx";
 import { useAppSelector } from "./hooks/storeHooks.ts";
 import { getTheme } from "./store/slices/theme.ts";
 import AboutMoviePage from "./pages/aboutMovie/AboutMoviePage.js";
+import HomePage from "./pages/HomePage.tsx";
 import SeatBookingPage from "./pages/seatBooking/SeatBookingPage.tsx";
 
 export const role: "admin" | "user" = "user"; //for demo
@@ -39,7 +40,7 @@ function App() {
             <Route path="/login" element={<LoginPage />} />
             {role === "user" && (
               <>
-                <Route path="/home" element={<div />} />
+                <Route path="/home" element={<HomePage />} />
                 {/*Home page for user*/}
                 <Route path="/schedule" element={<div />} />
                 {/*Session schedule page for user*/}
