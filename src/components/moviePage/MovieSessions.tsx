@@ -18,6 +18,8 @@ import { generateSessions, Session } from "../../helpers/lib/sessionsGenerator";
 
 // Data of movie sessions for demo
 const mockSessions = generateSessions();
+console.log("mockSessions:");
+console.log(mockSessions);
 
 const formatDescription = {
   SDH: "Subtitles for the Deaf or Hard-of-Hearing",
@@ -25,7 +27,7 @@ const formatDescription = {
   VIP: "A session in a separate hall with the option of waiter service directly during the session",
 };
 
-const MovieSessions = () => {
+const MovieSessions = ({ movieId }: { movieId: string }) => {
   const theme = useTheme();
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState(0);
@@ -62,21 +64,35 @@ const MovieSessions = () => {
   const handleDateChange = (event: React.SyntheticEvent, newValue: number) => {
     setSelectedDate(newValue);
   };
-  console.log("selectedDate:");
-  console.log(selectedDate);
-  console.log("expandedCinema:");
-  console.log(expandedCinema);
 
   const handleCinemaChange =
     (cinema: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
       setExpandedCinema(isExpanded ? cinema : false);
     };
 
-  const handleSessionTimeClick = (time: string) => {
-    console.log("TIME:");
-    console.log(time);
+  const handleSessionTimeClick = (
+    event: React.SyntheticEvent,
+    time: string,
+    session: Session
+  ) => {
+    //   "cinema": "Respublika Park IMAX",
+    // "location": "ул. Киевская, 15",
+    // "auditorium": "Зал #4",
+    // "datetime": "2025-02-01T16:30:00",
+    // "format": "IMAX 3D",
 
-    navigate(`/cart/${time}`);
+    // User choice of session data
+
+    const posterUrl = document.getElementById("moviePoster")?.src;
+    const movieName = document.getElementById("movieName")?.textContent;
+
+    const { times, ...rest } = session;
+    const userSessionInfo = { ...rest, time, posterUrl, movieName, movieId };
+    console.log("userSessionInfo:");
+    console.log(userSessionInfo);
+
+    event.preventDefault();
+    navigate(`/cart/seatplan`, { state: userSessionInfo });
   };
 
   return (
@@ -194,8 +210,9 @@ const MovieSessions = () => {
                     >
                       Format:
                     </Typography>
-                    {session.format.split(" ").map((f) => (
+                    {session.format.split(" ").map((f: string, i: number) => (
                       <Tooltip
+                        key={i}
                         title={`${formatDescription[f]}`}
                         arrow
                         placement="top"
@@ -233,9 +250,11 @@ const MovieSessions = () => {
                         key={time}
                         label={time}
                         variant="outlined"
-                        // onClick={() => handleSessionTimeClick(time)}
+                        onClick={(e) =>
+                          handleSessionTimeClick(e, time, session)
+                        }
                         component="a"
-                        href={`/cart/${time}`}
+                        href={"#"}
                         clickable
                         color="primary"
                         sx={{
