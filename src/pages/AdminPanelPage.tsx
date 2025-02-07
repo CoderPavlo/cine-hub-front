@@ -3,6 +3,7 @@ import { useState } from 'react'
 import CinemasTab from '../components/adminPanel/CinemasTab';
 import HallsTab from '../components/adminPanel/HallsTab';
 import SessionsTab from '../components/adminPanel/SessionsTab';
+import { useSearchParams } from 'react-router-dom';
 
 const tabList = [
     {
@@ -18,9 +19,14 @@ const tabList = [
         Tabpanel: <SessionsTab />,
     },
 ]
-
+const getTab = (tab: string | null) => {
+    let result = Number(tab);
+    if (isNaN(result) || result < 0 || result > tabList.length) result = 0;
+    return result;
+}
 export default function AdminPanelPage() {
-    const [selectedTab, setSelectedTab] = useState(0);
+    const [searchParams] = useSearchParams();
+    const [selectedTab, setSelectedTab] = useState(getTab(searchParams.get('tab')));
     return (
         <Box sx={{ my: 4 }}>
             <Tabs value={selectedTab} onChange={(e, value) => setSelectedTab(value)} centered aria-label="tabs">
