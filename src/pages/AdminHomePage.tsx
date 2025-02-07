@@ -1,5 +1,5 @@
-import { Box, Button, Card, CardContent, Grid2, Stack, Typography } from '@mui/material'
-import React, { useState } from 'react'
+import { Box, Card, CardContent, Grid2, Stack, Typography } from '@mui/material'
+import { useState } from 'react'
 import FilterBlock, { Filter } from '../components/adminPanel/FilterBlock';
 import SheduleForm from '../components/adminPanel/SheduleForm';
 const genStats = [
@@ -60,8 +60,8 @@ const AdminHomePage = () => {
                     )}
                 </Grid2>
             </Grid2>
-            <Grid2 size={{ xs: 12, md: 4 }} display='flex' flexDirection='column' height={{md: '392px'}} overflow='auto'>
-                    <SheduleForm filter={filter} home />
+            <Grid2 size={{ xs: 12, md: 4 }} display='flex' flexDirection='column' height={{ md: '392px' }} overflow='auto'>
+                <SheduleForm filter={filter} home />
             </Grid2>
         </Grid2>
     )
