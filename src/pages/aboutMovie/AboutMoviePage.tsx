@@ -19,6 +19,7 @@ import {
 } from "@mui/material";
 import CastCarousel from "../../components/moviePage/CastCarousel.js";
 import MovieSessions from "../../components/moviePage/MovieSessions.js";
+import { useTheme } from "@emotion/react";
 
 // Ids of films: 1138194, 539972, 426063, 1249289, 970450, 1184918, 1064213, 993710, 970450
 
@@ -48,7 +49,7 @@ export default function AboutMoviePage() {
     const m = parseInt(minutes);
     const hours = Math.floor(m / 60);
     const mins = m - hours * 60;
-    return `${hours}:${mins}`;
+    return `${hours.toString().padStart(2, "0")}:${mins}`;
   }
 
   useEffect(() => {
@@ -117,6 +118,7 @@ export default function AboutMoviePage() {
       sx={{
         paddingTop: "32px",
         paddingBottom: "55px",
+        px: { xs: "0 !important", lg: "24px !important" },
         bgcolor: "background.default",
       }}
     >
@@ -135,11 +137,25 @@ export default function AboutMoviePage() {
               top: { xs: 0, lg: 88 },
               maxHeight: { xs: "65vh", lg: "auto" },
               background: { xs: "rgba(0, 0, 0)", lg: "none" },
-              borderRadius: 2,
+
+              // Dark overlay on the image container
+              "&:after": {
+                xs: {
+                  content: '""',
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  width: "100%",
+                  height: "100%",
+                  background: "rgba(0, 0, 0, 0.5)",
+                },
+                lg: { display: "none" },
+              },
             }}
           >
             <CardMedia
               component="img"
+              id="moviePoster"
               image={
                 movieData.poster_path
                   ? `${BASE_IMG_URL}original/${movieData.poster_path}`
@@ -174,8 +190,12 @@ export default function AboutMoviePage() {
         </Grid2>
 
         {/* Movie Details section */}
-        <Grid2 size={{ xs: 12, lg: "grow" }} sx={{ order: { xs: 3, lg: 2 } }}>
+        <Grid2
+          size={{ xs: 12, lg: "grow" }}
+          sx={{ order: { xs: 3, lg: 2 }, px: { xs: "24px", lg: "0" } }}
+        >
           <Typography
+            id="movieName"
             variant="h3"
             sx={{
               color: "primary.main",
@@ -198,7 +218,7 @@ export default function AboutMoviePage() {
               >
                 <InfoItem
                   label="iMDB Rating"
-                  value={movieData.vote_average || "N/A"}
+                  value={movieData.vote_average.toFixed(1) || "N/A"}
                 />
               </Grid2>
               <Grid2
@@ -408,7 +428,7 @@ export default function AboutMoviePage() {
               Schedule of sessions
             </Typography>
             <Box sx={{ p: 2, bgcolor: "background.default", borderRadius: 2 }}>
-              <MovieSessions />
+              <MovieSessions movieId={movieId} />
             </Box>
           </Paper>
         </Grid2>

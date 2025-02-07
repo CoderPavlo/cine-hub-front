@@ -48,7 +48,7 @@ const MainPage: React.FC = () => {
   }, []);
 
   const handleMovieClick = (id: number) => {
-    navigate(`/movies/${id}`);
+    navigate(`/movie/${id}`);
   };
 
   return (

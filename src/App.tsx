@@ -16,8 +16,9 @@ import HomePage from "./pages/HomePage.tsx";
 import AdminPanelPage from "./pages/AdminPanelPage.tsx";
 import AdminHomePage from "./pages/AdminHomePage.tsx";
 import StatisticsPage from "./pages/StatisticsPage.tsx";
+import SeatBookingPage from "./pages/seatBooking/SeatBookingPage.tsx";
 
-export const role: "admin" | "user" = "admin"; //for demo
+export const role: "admin" | "user" = "user"; //for demo
 
 function App() {
   const { mode } = useAppSelector((state) => state.themeReducer);
@@ -49,7 +50,9 @@ function App() {
                 <Route path="/movie/:id" element={<AboutMoviePage />} />
                 {/*Movie details page*/}
                 <Route path="/session/:id" element={<div />} />
-                {/*Session detsils page for user*/}
+                {/*Session details page for user*/}
+                <Route path="/cart/seatplan" element={<SeatBookingPage />} />
+                {/*Session details page for user*/}
                 <Route path="/booking/:id" element={<div />} />
                 {/*Booking page for user*/}
                 <Route path="/profile" element={<div />} /> {/*Profile page*/}
