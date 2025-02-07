@@ -13,8 +13,9 @@ import { useAppSelector } from "./hooks/storeHooks.ts";
 import { getTheme } from "./store/slices/theme.ts";
 import AboutMoviePage from "./pages/aboutMovie/AboutMoviePage.js";
 import HomePage from "./pages/HomePage.tsx";
+import AdminPanelPage from "./pages/AdminPanelPage.tsx";
 
-export const role: "admin" | "user" = "user"; //for demo
+export const role: "admin" | "user" = "admin"; //for demo
 
 function App() {
   const { mode } = useAppSelector((state) => state.themeReducer);
@@ -54,7 +55,7 @@ function App() {
             )}
             {role === "admin" && (
               <>
-                <Route path="/admin-panel" element={<div />} />
+                <Route path="/admin-panel" element={<AdminPanelPage />} />
                 {/*Admin panel page for admin*/}
                 <Route path="/statistics" element={<div />} />
                 {/*Statistics page for admin*/}

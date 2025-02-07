@@ -44,3 +44,12 @@ export interface GetTrailerRequest {
     id: number,
     results: Trailer[],
 }
+
+export interface SearchRequest {
+    query: string,
+    include_adult?: boolean,
+    primary_release_year?: string,
+    page: number,
+    region?: string,
+    year?: string,
+}

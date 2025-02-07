@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { Genre, GetRequest, GetTrailerRequest, Movie } from '../../models/movie';
+import { Genre, GetRequest, GetTrailerRequest, Movie, SearchRequest } from '../../models/movie';
 import { API_BASE_URL, API_KEY } from '../../helpers/apiConfig';
 
 export const themoviedbAPI = createApi({
@@ -8,7 +8,7 @@ export const themoviedbAPI = createApi({
         baseUrl: API_BASE_URL,
     }),
     endpoints: (build) => ({
-        fetchGenres: build.query<{genres: Genre[]}, void>({
+        fetchGenres: build.query<{ genres: Genre[] }, void>({
             query: () => ({
                 url: `genre/movie/list?api_key=${API_KEY}&language=en-US`,
                 method: 'GET',
@@ -31,6 +31,26 @@ export const themoviedbAPI = createApi({
                 url: `movie/${id}/videos?language=en-US&api_key=${API_KEY}`,
                 method: 'GET',
             }),
+        }),
+        search: build.query<GetRequest<Movie>, SearchRequest>({
+            query: (data) => {
+                const params = new URLSearchParams();
+                params.append('query', data.query);
+                params.append('api_key', API_KEY);
+                params.append('language', 'en-US');
+                params.append('page', data.page.toString());
+                params.append('include_adult', (data.include_adult !== undefined ? data.include_adult : true).toString());
+                if (data.primary_release_year)
+                    params.append('primary_release_year', data.primary_release_year);
+                if (data.region)
+                    params.append('region', data.region);
+                if (data.year)
+                    params.append('year', data.year);
+                return {
+                    url: `search/movie?${params.toString()}`,
+                    method: 'GET',
+                };
+            },
         }),
     }),
 });
