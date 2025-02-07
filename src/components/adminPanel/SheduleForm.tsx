@@ -43,8 +43,6 @@ const SheduleForm = ({ filter, home }: SheduleFormProps) => {
         <Paper
             sx={{
                 p: 2,
-                position: { xs: "relative", lg: "sticky" },
-                top: { xs: "auto", lg: 88 },
                 bgcolor: "background.paper",
                 borderRadius: 2,
                 boxShadow: 3,
@@ -118,7 +116,7 @@ const SheduleForm = ({ filter, home }: SheduleFormProps) => {
                     {home &&
                         <Box mt={1} display='flex' justifyContent='center'>
                             <Button variant='outlined' 
-                            onClick={()=>navigate(`/admin-panel?tab=2&cinemaId=${filter.cinema?.id}&hallId=${filter.hall?.id}&date=${filter.date?.toISOString()}`)}>
+                            onClick={()=>navigate(`/admin-panel?tab=2&cinemaId=${filter.cinema?.id}&hallId=${filter.hall?.id}${filter.date ? `&date=${filter.date.toISOString()}` : ''}`)}>
                                 Go to admin panel
                             </Button>
                         </Box>

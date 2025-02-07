@@ -134,7 +134,7 @@ const SessionsTab = () => {
     }
     const [filter, setFilter] = useState<Filter>(initialFilter);
     return (
-        <Grid2 container px='24px' columnSpacing={2}>
+        <Grid2 container px={{md:'24px'}} columnSpacing={2}>
             <Grid2 size={12}>
                 <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
                     <Typography variant="h4">Session Management</Typography>
