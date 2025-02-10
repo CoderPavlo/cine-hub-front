@@ -12,6 +12,9 @@ import { Login, Logout, Person, Settings } from '@mui/icons-material';
 import ProfileTab from './ProfileTab.tsx';
 import SettingsTab from './SettingsTab.tsx';
 import { ReactNode, useState } from 'react';
+import { useAppDispatch, useAppSelector } from '../../../hooks/storeHooks.ts';
+import { useNavigate } from 'react-router-dom';
+import { clearTokens } from '../../../store/slices/auth.ts';
 
 interface ITabPanelProps {
     children: ReactNode,
@@ -39,10 +42,10 @@ export default function Profile() {
     const [open, setOpen] = useState<boolean>(false);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const theme = useTheme();
-    const isLogged = true; //for demo
+    const { role, isLogged } = useAppSelector((state) => state.authReducer);
     const [value, setValue] = useState<number>(isLogged ? 0 : 1);
-
-
+    const dispatch=useAppDispatch();
+    const navigate = useNavigate();
     return (
         <>
             <ButtonBase onClick={(e) => {
@@ -101,12 +104,15 @@ export default function Profile() {
                                                         </Stack>
                                                     </Grid>
                                                     <Grid>
-                                                        <IconButton size="large" color="secondary">
+                                                        <IconButton size="large" color="secondary" onClick={()=>{
+                                                            dispatch(clearTokens());
+                                                            navigate('/');
+                                                        }}>
                                                             <Logout />
                                                         </IconButton>
                                                     </Grid>
                                                 </Grid> :
-                                                <Button variant="outlined" startIcon={<Login />} fullWidth>
+                                                <Button variant="outlined" startIcon={<Login />} fullWidth onClick={()=>navigate('/login')}>
                                                 Log in
                                               </Button>
                                         

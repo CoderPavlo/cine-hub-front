@@ -1,15 +1,19 @@
-import { useState } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
-import { Button, Box, InputAdornment, TextField, useTheme, FormControlLabel, Checkbox } from "@mui/material";
+import { Button, useTheme, FormControlLabel, Checkbox, Typography } from "@mui/material";
 
 import PasswordInput from "./PasswordInput";
 import EmailInput from "./EmailInput";
-import { AlternateEmail } from "@mui/icons-material";
+import { useAppDispatch } from "../../hooks/storeHooks";
+import authAPI from "../../store/api/auth";
+import { IAuthResponse } from "../../models/auth";
+import { setTokens } from "../../store/slices/auth";
+import { useNavigate } from "react-router-dom";
 
 export default function LoginForm() {
-  const [error, setError] = useState(null);
-
+  const [login, { isLoading, error }] = authAPI.useLoginMutation();
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const validationSchema = yup.object({
     email: yup
       .string()
@@ -30,7 +34,17 @@ export default function LoginForm() {
     validationSchema: validationSchema,
 
     onSubmit: async (values) => {
-      console.log("Login USER Values:", values);
+      await login({
+        email: values.email,
+        password: values.password,
+      }).unwrap()
+      .then((payload: IAuthResponse) => {
+        dispatch(setTokens(payload));
+        navigate('/home');
+      })
+      .catch(async (error) => {
+        console.log(error);
+      })
     },
   });
   const theme=useTheme();
@@ -56,9 +70,9 @@ export default function LoginForm() {
 
       <FormControlLabel control={<Checkbox name="rememberMe" value={formik.values.rememberMe} onChange={formik.handleChange}/>} label="Remember Me" />
 
-      {error && <Box color='error'>{error}</Box>}
+      {error && <Typography variant='body1' color='error'>{"data" in error ? (error.data as { message?: string }).message || "Unknown error" : "Network error"}</Typography>}
 
-      <Button color="primary" variant="contained" fullWidth type="submit">
+      <Button loading={isLoading} color="primary" variant="contained" fullWidth type="submit">
         Submit
       </Button>
     </form>
