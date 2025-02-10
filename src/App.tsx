@@ -18,10 +18,11 @@ import AdminHomePage from "./pages/AdminHomePage.tsx";
 import StatisticsPage from "./pages/StatisticsPage.tsx";
 import SeatBookingPage from "./pages/seatBooking/SeatBookingPage.tsx";
 
-export const role: "admin" | "user" = "user"; //for demo
+// export const role: "admin" | "user" = "user"; //for demo
 
 function App() {
   const { mode } = useAppSelector((state) => state.themeReducer);
+  const { role, isLogged } = useAppSelector((state) => state.authReducer);
   const systemMode = useMediaQuery("(prefers-color-scheme: dark)")
     ? "dark"
     : "light";
@@ -40,8 +41,10 @@ function App() {
           <Navbar />
           <Routes>
             <Route path="/" element={<MainPage />} />
-            <Route path="/login" element={<LoginPage />} />
-            {role === "user" && (
+            {!isLogged &&
+              <Route path="/login" element={<LoginPage />} />
+            }
+            {role === "User" && (
               <>
                 <Route path="/home" element={<HomePage />} />
                 {/*Home page for user*/}
@@ -58,7 +61,7 @@ function App() {
                 <Route path="/profile" element={<div />} /> {/*Profile page*/}
               </>
             )}
-            {role === "admin" && (
+            {role === "Admin" && (
               <>
                 <Route path="/home" element={<AdminHomePage />} />
                 <Route path="/admin-panel" element={<AdminPanelPage />} />
@@ -69,7 +72,10 @@ function App() {
                 {/*Settings page for admin*/}
               </>
             )}
-            <Route path="*" element={<Navigate to="/" />} />
+            {isLogged ?
+              <Route path="*" element={<Navigate to="/home" />} /> :
+              <Route path="*" element={<Navigate to="/" />} />
+            }
             {/*Redirect to main page*/}
           </Routes>
           <Footer />

@@ -1,11 +1,11 @@
 import { Menu, Slideshow } from "@mui/icons-material";
 import { AppBar, Toolbar, Typography, Button, Box, Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemText, ButtonBase, useTheme } from "@mui/material";
 import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { role } from "../../../App";
+import { Link, useNavigate } from "react-router-dom";
 import Notifications from "./Notifications";
 import Profile from "./Profile";
 import { useActiveRoute } from "../../../hooks/useActiveRoute";
+import { useAppSelector } from "../../../hooks/storeHooks";
 
 
 const drawerWidth = 280;
@@ -20,14 +20,10 @@ const adminPages = [
   { link: '/statistics', title: 'Statistics' },
 ]
 export default function Navbar() {
-  const pages = role === 'admin' ? adminPages : userPages;
-  const location = useLocation();
+  
+  const { role, isLogged } = useAppSelector((state) => state.authReducer);
+  const pages = role === 'Admin' ? adminPages : role === 'User' ? userPages : [];
   const navigate = useNavigate();
-  const hideNavbarRoutes = ["/login"];
-  if (hideNavbarRoutes.includes(location.pathname)) {
-    return null;
-  }
-  const isLogged = true;
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const handleDrawerToggle = () => {

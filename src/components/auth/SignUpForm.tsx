@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import {
@@ -11,15 +10,21 @@ import {
   FormHelperText,
   Box,
   useTheme,
+  Typography,
 } from "@mui/material";
 import PasswordInput from "./PasswordInput";
 import EmailInput from "./EmailInput";
 import { useNavigate } from "react-router-dom";
+import authAPI from "../../store/api/auth";
+import { useAppDispatch } from "../../hooks/storeHooks";
+import { IAuthResponse } from "../../models/auth";
+import { setTokens } from "../../store/slices/auth";
 
 export default function SignUpForm() {
   const navigate = useNavigate();
-  const [error, setError] = useState(null);
 
+  const [register, { isLoading, error }] = authAPI.useRegisterMutation();
+  const dispatch = useAppDispatch();
   const validationSchema = yup.object({
     email: yup
       .string()
@@ -47,7 +52,21 @@ export default function SignUpForm() {
     validationSchema: validationSchema,
 
     onSubmit: async (values) => {
-      console.log("SignUp User values:", values);
+      await register({
+        name: values.name,
+        surname: values.surname,
+        birthday: new Date(values.dob).toISOString(),
+        email: values.email,
+        password: values.password,
+      }).unwrap()
+        .then((payload: IAuthResponse) => {
+          dispatch(setTokens(payload));
+          navigate('/home');
+        })
+        .catch(async (error) => {
+          console.log(error);
+        })
+
     },
   });
   const theme = useTheme();
@@ -131,8 +150,8 @@ export default function SignUpForm() {
         error={formik.touched.password && Boolean(formik.errors.password)}
         helperText={formik.touched.password && formik.errors.password}
       />
-      {error && <Box color='error'>{error}</Box>}
-      <Button color="primary" variant="contained" fullWidth type="submit">
+      {error && <Typography variant='body1' color='error'>{"data" in error ? (error.data as { message?: string }).message || "Unknown error" : "Network error"}</Typography>}
+      <Button loading={isLoading} color="primary" variant="contained" fullWidth type="submit">
         Submit
       </Button>
     </form>

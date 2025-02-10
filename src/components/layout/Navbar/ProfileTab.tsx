@@ -4,6 +4,7 @@ import { OverridableComponent } from '@mui/material/OverridableComponent';
 
 import { useNavigate } from 'react-router';
 import { useAppDispatch } from '../../../hooks/storeHooks';
+import { clearTokens } from '../../../store/slices/auth';
 export interface IListEl {
     primary: string,
     Icon: OverridableComponent<SvgIconTypeMap<{}, "svg">> & { muiName: string; },
@@ -40,7 +41,11 @@ export default function ProfileTab() {
     return (
         <List component="nav" sx={{ p: 0, '& .MuiListItemIcon-root': { minWidth: 32, } }}>
             {list.map((item, index) =>
-                <ListItemButton key={index} onClick={()=>navigate(item.link)}>
+                <ListItemButton key={index} onClick={()=>{
+                    if(item.link==='/')
+                        dispatch(clearTokens());
+                    navigate(item.link)
+                    }}>
                     <ListItemIcon>
                         <item.Icon/>
                     </ListItemIcon>
