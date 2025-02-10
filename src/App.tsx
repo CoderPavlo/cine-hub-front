@@ -13,6 +13,9 @@ import { useAppSelector } from "./hooks/storeHooks.ts";
 import { getTheme } from "./store/slices/theme.ts";
 import AboutMoviePage from "./pages/aboutMovie/AboutMoviePage.js";
 import HomePage from "./pages/HomePage.tsx";
+import AdminPanelPage from "./pages/AdminPanelPage.tsx";
+import AdminHomePage from "./pages/AdminHomePage.tsx";
+import StatisticsPage from "./pages/StatisticsPage.tsx";
 import SeatBookingPage from "./pages/seatBooking/SeatBookingPage.tsx";
 
 export const role: "admin" | "user" = "user"; //for demo
@@ -57,9 +60,10 @@ function App() {
             )}
             {role === "admin" && (
               <>
-                <Route path="/admin-panel" element={<div />} />
+                <Route path="/home" element={<AdminHomePage />} />
+                <Route path="/admin-panel" element={<AdminPanelPage />} />
                 {/*Admin panel page for admin*/}
-                <Route path="/statistics" element={<div />} />
+                <Route path="/statistics" element={<StatisticsPage />} />
                 {/*Statistics page for admin*/}
                 <Route path="/settings" element={<div />} />
                 {/*Settings page for admin*/}
