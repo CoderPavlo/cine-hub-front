@@ -1,11 +1,12 @@
-import { Menu, Slideshow } from "@mui/icons-material";
-import { AppBar, Toolbar, Typography, Button, Box, Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemText, ButtonBase, useTheme } from "@mui/material";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { LocationOn, Menu, Slideshow } from "@mui/icons-material";
+import { AppBar, Toolbar, Typography, Button, Box, Divider, Drawer, IconButton, List, ListItem, ListItemButton, ListItemText, ButtonBase, useTheme, Autocomplete, TextField, InputAdornment } from "@mui/material";
+import { useMemo, useState } from "react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import Notifications from "./Notifications";
 import Profile from "./Profile";
 import { useActiveRoute } from "../../../hooks/useActiveRoute";
 import { useAppSelector } from "../../../hooks/storeHooks";
+import { Cinema } from "../../../models/tables";
 
 
 const drawerWidth = 280;
@@ -19,9 +20,21 @@ const adminPages = [
   { link: '/admin-panel', title: 'Admin panel' },
   { link: '/statistics', title: 'Statistics' },
 ]
+const data: Cinema[] = [
+  { id: '1', location: 'Kyiv, Ocean Plaza' },
+];
 export default function Navbar() {
-  
-  const { role, isLogged } = useAppSelector((state) => state.authReducer);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const cinema = useMemo(() => {
+    let value = data.find(item => item.id === searchParams.get('cinema'));
+    if (!value) {
+      value = data[0];
+      setSearchParams({ cinema: value.id });
+    }
+    return value;
+  }, [searchParams, data]);
+  const { isLogged } = useAppSelector((state) => state.authReducer);
+  const role = 'User';
   const pages = role === 'Admin' ? adminPages : role === 'User' ? userPages : [];
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -60,10 +73,34 @@ export default function Navbar() {
           <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
             {logo}
           </Box>
+          <Box display='flex' flexDirection='row' alignItems='center'>
+            <LocationOn fontSize="medium" />
+            <Autocomplete
+              value={cinema}
+              onChange={(event, newValue) => {
+                if (newValue)
+                  setSearchParams({ cinema: newValue.id });
+              }}
+              options={data}
+              getOptionLabel={(option) => option.location}
+              renderInput={(params) => <TextField {...params}
+                size="medium"
+                sx={{
+                  width: '200px'
+                }}
+
+                variant="standard"
+
+              />}
+              noOptionsText='There are no cinema'
+              isOptionEqualToValue={(option, value) => option.id === value.id}
+              sx={{ ml: 1 }}
+            />
+          </Box>
           <Box display='flex' flexDirection='row'>
             <Box sx={{ display: { xs: 'none', sm: 'flex' }, mr: 3 }} alignItems='center'>
               {pages.map((item) => (
-                <Button key={item.title} sx={{ color: isActive(item.link) ? 'text.primary': 'text.secondary' }} onClick={() => navigate(item.link)}>
+                <Button key={item.title} sx={{ color: isActive(item.link) ? 'text.primary' : 'text.secondary' }} onClick={() => navigate(item.link)}>
                   {item.title}
                 </Button>
               ))}
