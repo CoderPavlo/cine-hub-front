@@ -19,6 +19,7 @@ import StatisticsPage from "./pages/StatisticsPage.tsx";
 import SeatBookingPage from "./pages/seatBooking/SeatBookingPage.tsx";
 import SchedulePage from "./pages/SchedulePage.tsx";
 import SearchPage from "./pages/SearchPage.tsx";
+import TicketPage from "./pages/TicketPage.tsx";
 
 // export const role: "admin" | "user" = "user"; //for demo
 
@@ -46,14 +47,14 @@ function App() {
             {!isLogged &&
               <Route path="/login" element={<LoginPage />} />
             }
-                <Route path="/home" element={<HomePage />} />
 
                 <Route path="/schedule" element={<SchedulePage />} />
                 <Route path="/search" element={<SearchPage />} />
-
+                
             {role === "User" && (
               <>
                 {/*Home page for user*/}
+                <Route path="/home" element={<HomePage />} />
                 {/*Session schedule page for user*/}
                 <Route path="/movie/:id" element={<AboutMoviePage />} />
                 {/*Movie details page*/}
@@ -64,6 +65,7 @@ function App() {
                 <Route path="/booking/:id" element={<div />} />
                 {/*Booking page for user*/}
                 <Route path="/profile" element={<div />} /> {/*Profile page*/}
+                <Route path="/tickets" element={<TicketPage />} />
               </>
             )}
             {role === "Admin" && (
