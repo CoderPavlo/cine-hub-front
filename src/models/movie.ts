@@ -67,6 +67,11 @@ export interface SearchRequest {
     include_adult?: boolean,
     primary_release_year?: string,
     page: number,
-    region?: string,
+    region?: string | null,
     year?: string,
+}
+
+export interface Region {
+    iso_3166_1: string,
+    english_name: string,
 }

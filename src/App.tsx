@@ -18,6 +18,7 @@ import AdminHomePage from "./pages/AdminHomePage.tsx";
 import StatisticsPage from "./pages/StatisticsPage.tsx";
 import SeatBookingPage from "./pages/seatBooking/SeatBookingPage.tsx";
 import SchedulePage from "./pages/SchedulePage.tsx";
+import SearchPage from "./pages/SearchPage.tsx";
 
 // export const role: "admin" | "user" = "user"; //for demo
 
@@ -48,6 +49,7 @@ function App() {
                 <Route path="/home" element={<HomePage />} />
 
                 <Route path="/schedule" element={<SchedulePage />} />
+                <Route path="/search" element={<SearchPage />} />
 
             {role === "User" && (
               <>
