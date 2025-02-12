@@ -21,8 +21,6 @@ import SchedulePage from "./pages/SchedulePage.tsx";
 import SearchPage from "./pages/SearchPage.tsx";
 import TicketPage from "./pages/TicketPage.tsx";
 
-// export const role: "admin" | "user" = "user"; //for demo
-
 function App() {
   const { mode } = useAppSelector((state) => state.themeReducer);
   const { role, isLogged } = useAppSelector((state) => state.authReducer);
