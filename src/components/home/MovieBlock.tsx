@@ -21,7 +21,7 @@ export default function MovieBlock({ title, page, setPage, data, isFetching, err
     if (data) {
       window.scrollTo({ top: top, behavior: "smooth" });
     }
-  }, [data]);
+  }, [page]);
   return (
     <>
       <Typography variant="h5" gutterBottom sx={{ mt: 3 }} color="textPrimary">

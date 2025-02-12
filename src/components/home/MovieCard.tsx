@@ -19,9 +19,9 @@ const getGenres = (genres: number[], allGenres: Genre[]) => {
     return result;
 }
 interface MovieCardProps {
-    movie: Movie, 
+    movie: Movie,
     genresData?: { genres: Genre[] },
-    buttonOnClick: ()=>void,
+    buttonOnClick: () => void,
 }
 export default function MovieCard({ movie, genresData, buttonOnClick }: MovieCardProps) {
     return (
@@ -29,9 +29,9 @@ export default function MovieCard({ movie, genresData, buttonOnClick }: MovieCar
             <StyledCard>
                 <CardMedia
                     component="img"
-                    height="300"
                     image={`${BASE_IMG_URL}w500${movie.poster_path}`}
                     alt={movie.title}
+                    sx={{ aspectRatio: "2/3", objectFit: "cover" }}
                     loading="lazy"
                 />
                 <CardContent>
@@ -49,7 +49,7 @@ export default function MovieCard({ movie, genresData, buttonOnClick }: MovieCar
                     </Box>
                     <Box sx={{ mt: 2, display: "flex", gap: 1 }}>
                         <Button
-                            onClick={(e)=>{
+                            onClick={(e) => {
                                 e.preventDefault();
                                 buttonOnClick();
                             }}
