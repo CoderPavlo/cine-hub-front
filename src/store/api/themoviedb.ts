@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { Genre, GetRequest, GetTrailerRequest, Movie, SearchRequest } from '../../models/movie';
+import { Genre, GetRequest, GetTrailerRequest, Movie, MovieDetail, SearchRequest } from '../../models/movie';
 import { API_BASE_URL, API_KEY } from '../../helpers/apiConfig';
 
 export const themoviedbAPI = createApi({
@@ -29,6 +29,12 @@ export const themoviedbAPI = createApi({
         fetchTrailer: build.query<GetTrailerRequest, number | undefined>({
             query: (id) => ({
                 url: `movie/${id}/videos?language=en-US&api_key=${API_KEY}`,
+                method: 'GET',
+            }),
+        }),
+        fetchMovie: build.query<MovieDetail, number>({
+            query: (id) => ({
+                url: `movie/${id}?language=en-US&api_key=${API_KEY}`,
                 method: 'GET',
             }),
         }),
