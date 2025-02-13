@@ -15,13 +15,6 @@ export interface Movie {
     vote_count: number;
 }
 
-export interface GetRequest<T> {
-    page: number,
-    results: T[],
-    total_pages: number,
-    total_results: number,
-}
-
 export interface Genre {
     id: number,
     name: string,

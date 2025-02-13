@@ -14,6 +14,12 @@ export const saveTokens = (auth: IAuthResponse) => {
     Cookies.set('refreshToken', auth.refreshToken, { expires: refreshExpiration });
 }
 
+export const deleteTokens = () => {
+    Cookies.remove('role');
+    Cookies.remove('accessToken');
+    Cookies.remove('refreshToken');
+}
+
 export const authSlice = createSlice({
     name: 'auth',
     initialState: {
@@ -29,9 +35,7 @@ export const authSlice = createSlice({
         clearTokens: (state) => {
             state.isLogged = false;
             state.role = undefined;
-            Cookies.remove('role');
-            Cookies.remove('accessToken');
-            Cookies.remove('refreshToken');
+            deleteTokens();
         }
     },
 });

@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { Genre, GetRequest, GetTrailerRequest, Movie, SearchRequest } from '../../models/movie';
+import { Genre, GetTrailerRequest, Movie, SearchRequest } from '../../models/movie';
 import { API_BASE_URL, API_KEY } from '../../helpers/apiConfig';
+import { GetRequest } from '../../models/api';
 
 export const themoviedbAPI = createApi({
     reducerPath: 'themoviedbAPI',
