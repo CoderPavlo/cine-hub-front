@@ -3,6 +3,7 @@ import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
 import { Cinema } from "../../models/tables";
 import serverAPI from "../../store/api/server";
+import ErrorDisplay from "../common/ErrorDisplay";
 
 interface CinemaDialogProps {
     open: boolean;
@@ -29,12 +30,12 @@ const CinemaDialog = ({ open, onClose, cinema }: CinemaDialogProps) => {
                             id: cinema.id,
                             location: values.location
                         }).then(() => {
-                            if (errorCreate===undefined) onClose();
+                            if (errorUpdate===undefined) onClose();
                         }) :
                         await create({
                             location: values.location
                         }).then(() => {
-                            if (errorUpdate===undefined) onClose()
+                            if (errorCreate===undefined) onClose()
                         })
                 }}
             >
@@ -49,8 +50,7 @@ const CinemaDialog = ({ open, onClose, cinema }: CinemaDialogProps) => {
                                 error={touched.location && Boolean(errors.location)}
                                 helperText={touched.location && errors.location}
                             />
-                            {errorCreate && <Typography sx={{mt: 1}} variant='body1' color='error'>{"data" in errorCreate ? (errorCreate.data as { message?: string }).message || "Unknown error" : "Network error"}</Typography>}
-                            {errorUpdate && <Typography sx={{mt: 1}} variant='body1' color='error'>{"data" in errorUpdate ? (errorUpdate.data as { message?: string }).message || "Unknown error" : "Network error"}</Typography>}
+                            <ErrorDisplay error={cinema ? errorUpdate : errorCreate} sx={{ mt: 1 }} />
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={onClose}>Cancel</Button>

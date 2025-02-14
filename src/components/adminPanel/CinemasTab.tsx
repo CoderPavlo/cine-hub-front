@@ -17,8 +17,8 @@ export default function CinemasTab() {
         setTimeout(() => setCinema(undefined), 200);
     }
     const [filter, setfilter] = useState<PaginationProps>({ page: 1, itemsPerPage: 10 });
-    const {data, isFetching, error, refetch} = serverAPI.useFetchCinemasQuery(filter);
-    const [deleteQuery, {isLoading: deleteLoading, error: deleteError}] = serverAPI.useDeleteCinemaMutation();
+    const { data, isFetching, error, refetch } = serverAPI.useFetchCinemasQuery(filter);
+    const [deleteQuery, { isLoading: deleteLoading, error: deleteError }] = serverAPI.useDeleteCinemaMutation();
     return (
         <Container maxWidth="lg">
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
@@ -27,15 +27,10 @@ export default function CinemasTab() {
             </Box>
             <AdminTable
                 data={data}
-                columns={['Id', 'Location']}
+                columns={['Location']}
+                values={item=>[item.location]}
                 filter={filter}
                 onFilterChange={(name, value) => setfilter({ ...filter, page: 1, [name]: value })}
-                getRow={(item) => (
-                    <>
-                        <TableCell>{item.id}</TableCell>
-                        <TableCell>{item.location}</TableCell>
-                    </>
-                )}
                 loading={isFetching}
                 error={Boolean(error)}
                 editOnClick={(item) => { setCinema(item); setOpen(true); }}
@@ -43,12 +38,13 @@ export default function CinemasTab() {
                 refetch={refetch}
             />
             <CinemaDialog open={open} onClose={handleClose} cinema={cinema} />
-            <DeleteDialog open={deleteCinema != undefined} onClose={() => setDeleteCinema(undefined)} 
-            onClick={async () => {
-                await deleteQuery(deleteCinema?.id || '').then(() => {
-                    if (deleteError===undefined) setDeleteCinema(undefined);
-                })
-            }}
+            <DeleteDialog open={deleteCinema != undefined} onClose={() => setDeleteCinema(undefined)}
+                onClick={async () => {
+                    await deleteQuery(deleteCinema?.id || '').then(() => {
+                        console.log(deleteError);
+                        if (deleteError === undefined) setDeleteCinema(undefined);
+                    })
+                }}
                 type='cinema' name={deleteCinema?.location} loading={deleteLoading} error={deleteError}
             />
         </Container>

@@ -1,7 +1,6 @@
 import { GetRequest, PaginationProps } from '../../models/api'
 import { Edit, Delete, Update } from '@mui/icons-material';
 import { TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Stack, Tooltip, IconButton, Skeleton, Typography, TablePagination } from '@mui/material';
-import { ReactNode } from 'react';
 import LoadingComponent from '../common/LoadingComponent';
 
 interface AdminTableProps<T> {
@@ -9,7 +8,7 @@ interface AdminTableProps<T> {
     columns: string[],
     filter: PaginationProps,
     onFilterChange: (name: keyof PaginationProps, value: PaginationProps[typeof name]) => void,
-    getRow: (item: T) => ReactNode,
+    values: (item: T) => (string|number)[],
     editOnClick: (item: T) => void,
     deleteOnClick: (item: T) => void,
     loading: boolean,
@@ -17,7 +16,7 @@ interface AdminTableProps<T> {
     refetch: () => void,
 }
 
-const AdminTable = <T extends Record<string, any>>({ data, columns, filter, onFilterChange, getRow, editOnClick, deleteOnClick, loading, error, refetch }: AdminTableProps<T>) => {
+const AdminTable = <T extends Record<string, any>>({ data, columns, filter, onFilterChange, values, editOnClick, deleteOnClick, loading, error, refetch }: AdminTableProps<T>) => {
     return (
         <Paper>
             <TableContainer>
@@ -60,7 +59,7 @@ const AdminTable = <T extends Record<string, any>>({ data, columns, filter, onFi
                         >
                             {data && data.results.map((item, index) => (
                                 <TableRow key={index}>
-                                    {getRow(item)}
+                                    {values(item).map((key)=><TableCell key={key}>{key}</TableCell>)}
                                     <TableCell>
                                         <Stack direction='row' spacing={1}>
                                             <Tooltip title="Edit">

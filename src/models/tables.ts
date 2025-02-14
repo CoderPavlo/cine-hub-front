@@ -8,7 +8,7 @@ export interface Hall {
     name: string,
     rowCount: number,
     seatsPerRow: number,
-    cinema: Cinema,
+    cinemaName: string,
 }
 
 export interface Session {

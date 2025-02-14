@@ -1,6 +1,7 @@
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions, Button, Typography } from "@mui/material"
 import { SerializedError } from "@reduxjs/toolkit";
 import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import ErrorDisplay from "../common/ErrorDisplay";
 
 interface DeleteDialog {
     open: boolean,
@@ -26,7 +27,7 @@ const DeleteDialog = ({ open, onClose, onClick, name, type, loading, error }: De
                 <DialogContentText id="alert-dialog-description">
                     {name}
                 </DialogContentText>
-                {error && <Typography sx={{mt: 1}} variant='body1' color='error'>{"data" in error ? (error.data as { message?: string }).message || "Unknown error" : "Network error"}</Typography>}
+                <ErrorDisplay error={error} sx={{ mt: 1 }} />
             </DialogContent>
             <DialogActions>
                 <Button onClick={onClose}>Cancel</Button>

@@ -1,8 +1,8 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { BASE_URL } from '../../helpers/apiConfig';
 import prepareHeaders from './prepareHeaders';
-import { Cinema } from '../../models/tables';
-import { GetRequest, PaginationProps } from '../../models/api';
+import { Cinema, Hall } from '../../models/tables';
+import { CreateHall, GetHalls, GetRequest, PaginationProps, UpdateHall } from '../../models/api';
 
 const serverAPI = createApi({
     reducerPath: 'serverAPI',
@@ -10,7 +10,7 @@ const serverAPI = createApi({
         baseUrl: BASE_URL + 'api/',
         prepareHeaders: prepareHeaders
     }),
-    tagTypes: ['Cinema'],
+    tagTypes: ['Cinema', 'Hall'],
     endpoints: (build) => ({
         fetchCinemas: build.query<GetRequest<Cinema>, PaginationProps>({
             query: ({page, itemsPerPage}) => ({
@@ -41,6 +41,36 @@ const serverAPI = createApi({
                 method: 'DELETE',
             }),
             invalidatesTags: ['Cinema'],
+        }),
+        fetchHalls: build.query<GetRequest<Hall>, GetHalls>({
+            query: ({page, itemsPerPage, cinemaId}) => ({
+                url: `hall?itemsPerPage=${itemsPerPage}&page=${page}${cinemaId ? `&cinemaId=${cinemaId}` : ''}`,
+                method: 'GET',
+            }),
+            providesTags: ['Hall'],
+        }),
+        createHall: build.mutation<void, CreateHall>({
+            query: (data) => ({
+                url: 'hall',
+                method: 'POST',
+                body: data,
+            }),
+            invalidatesTags: ['Hall'],
+        }),
+        updateHall: build.mutation<void, UpdateHall>({
+            query: ({ id, ...data }) => ({
+                url: `hall/${id}`,
+                method: 'PUT',
+                body: data,
+            }),
+            invalidatesTags: ['Hall'],
+        }),
+        deleteHall: build.mutation<void, string>({
+            query: (id) => ({
+                url: `hall/${id}`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: ['Hall'],
         }),
     })
 })

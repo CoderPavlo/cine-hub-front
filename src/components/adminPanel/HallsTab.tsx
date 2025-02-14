@@ -1,50 +1,13 @@
-import { Delete, Edit } from '@mui/icons-material';
-import { Box, Typography, Button, TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, IconButton, Pagination, Tooltip, Autocomplete, TextField, Container } from '@mui/material'
+import { Box, Typography, Button, Paper, TableCell, Autocomplete, TextField, Container } from '@mui/material'
 import { useState } from 'react'
 import { Cinema, Hall } from '../../models/tables';
 import DeleteDialog from './DeleteDialog';
 import HallDialog from './HallDialog';
+import serverAPI from '../../store/api/server';
+import { PaginationProps } from '../../models/api';
+import AdminTable from './AdminTable';
 
 export default function HallsTab() {
-    const data: Hall[] = [
-        {
-            id: "101",
-            name: "IMAX",
-            rowCount: 12,
-            seatsPerRow: 20,
-            cinema: { id: "1", location: "Kyiv, Ocean Plaza" },
-        },
-        {
-            id: "102",
-            name: "VIP Lounge",
-            rowCount: 8,
-            seatsPerRow: 15,
-            cinema: { id: "1", location: "Kyiv, Ocean Plaza" },
-        },
-        {
-            id: "103",
-            name: "Standard Hall 1",
-            rowCount: 10,
-            seatsPerRow: 18,
-            cinema: { id: "1", location: "Kyiv, Ocean Plaza" },
-        },
-        {
-            id: "104",
-            name: "Standard Hall 2",
-            rowCount: 10,
-            seatsPerRow: 18,
-            cinema: { id: "1", location: "Kyiv, Ocean Plaza" },
-        },
-        {
-            id: "105",
-            name: "4DX",
-            rowCount: 6,
-            seatsPerRow: 12,
-            cinema: { id: "1", location: "Kyiv, Ocean Plaza" },
-        }
-    ];
-
-    const [page, setPage] = useState(1);
     const [open, setOpen] = useState(false);
     const [deleteHall, setDeleteHall] = useState<Hall>();
     const [hall, setHall] = useState<Hall>();
@@ -53,9 +16,10 @@ export default function HallsTab() {
         setTimeout(() => setHall(undefined), 200);
     }
     const [filter, setFilter] = useState<Cinema | null>(null);
-    const cinemas: Cinema[] = [
-        { id: '1', location: 'Kyiv, Ocean Plaza' }
-    ];
+    const { data: cinemas, isLoading } = serverAPI.useFetchCinemasQuery({ page: 1, itemsPerPage: 10000 });
+    const [pagination, setPagination] = useState<PaginationProps>({ page: 1, itemsPerPage: 10 });
+    const { data, isFetching, error, refetch } = serverAPI.useFetchHallsQuery({ ...pagination, cinemaId: filter ? filter.id : undefined })
+    const [deleteQuery, { isLoading: deleteLoading, error: deleteError }] = serverAPI.useDeleteHallMutation();
     return (
         <Container maxWidth="lg">
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
@@ -67,65 +31,37 @@ export default function HallsTab() {
                 <Autocomplete
                     value={filter}
                     onChange={(event, newValue) => setFilter(newValue)}
-                    options={cinemas}
+                    options={cinemas ? cinemas.results : [] as Cinema[]}
                     getOptionLabel={(option) => option.location}
                     renderInput={(params) => <TextField {...params}
                         label="Cinema" />}
                     noOptionsText='There are no cinema'
                     isOptionEqualToValue={(option, value) => option.id === value.id}
-                    sx={{mt:2}}
+                    sx={{ mt: 2 }}
+                    loading={isLoading}
                 />
             </Paper>
-            <TableContainer component={Paper}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>Id</TableCell>
-                            <TableCell>Name</TableCell>
-                            <TableCell>Row Count</TableCell>
-                            <TableCell>Seats Per Row</TableCell>
-                            <TableCell>Cinema</TableCell>
-                            <TableCell>Actions</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {data.map((item, index) => (
-                            <TableRow key={index}>
-                                <TableCell>{item.id}</TableCell>
-                                <TableCell>{item.name}</TableCell>
-                                <TableCell>{item.rowCount}</TableCell>
-                                <TableCell>{item.seatsPerRow}</TableCell>
-                                <TableCell>{item.cinema.location}</TableCell>
-                                <TableCell>
-                                    <Tooltip title="Edit">
-                                        <IconButton color="primary" size="small" onClick={() => { setHall(item); setOpen(true) }}>
-                                            <Edit />
-                                        </IconButton>
-                                    </Tooltip>
-                                    <Tooltip title="Delete">
-                                        <IconButton color="error" size="small" onClick={() => setDeleteHall(item)} sx={{ ml: 1 }}>
-                                            <Delete />
-                                        </IconButton>
-                                    </Tooltip>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-            {/* {data && data.total_pages > 1 && */}
-            <Pagination count={10} variant="outlined" color="primary" page={page} onChange={(e, page) => setPage(page)}
-                size='large'
-                sx={{
-                    paddingBlock: 2,
-                    display: 'flex',
-                    justifyContent: 'center'
-                }}
+            <AdminTable
+                data={data}
+                columns={['Name', 'Row Count', 'Seats Per Row', 'Cinema']}
+                values={item => [item.name, item.rowCount, item.seatsPerRow, item.cinemaName]}
+                filter={pagination}
+                onFilterChange={(name, value) => setPagination({ ...pagination, page: 1, [name]: value })}
+                loading={isFetching}
+                error={Boolean(error)}
+                editOnClick={(item) => { setHall(item); setOpen(true) }}
+                deleteOnClick={(item) => setDeleteHall(item)}
+                refetch={refetch}
             />
-            {/* } */}
             <HallDialog open={open} onClose={handleClose} hall={hall} />
-            <DeleteDialog open={deleteHall != undefined} onClose={() => setDeleteHall(undefined)} onClick={() => setDeleteHall(undefined)}
-                type='hall' name={`Name: ${deleteHall?.name}\nCinema: ${deleteHall?.cinema.location}`}
+            <DeleteDialog open={deleteHall != undefined} onClose={() => setDeleteHall(undefined)}
+                type='hall' name={`Name: ${deleteHall?.name}\nCinema: ${deleteHall?.cinemaName}`}
+                onClick={async () => {
+                    await deleteQuery(deleteHall?.id || '').then(() => {
+                        if (deleteError === undefined) setDeleteHall(undefined);
+                    })
+                }}
+                loading={deleteLoading} error={deleteError}
             />
         </Container>
     )
