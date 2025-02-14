@@ -27,3 +27,11 @@ export interface UpdateHall {
     rowCount: number,
     seatsPerRow: number,
 }
+
+export interface User {
+    id: string,
+    name: string,
+    surname: string,
+    birthday: string,
+    email: string,
+}

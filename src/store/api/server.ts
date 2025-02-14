@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { BASE_URL } from '../../helpers/apiConfig';
 import prepareHeaders from './prepareHeaders';
 import { Cinema, Hall } from '../../models/tables';
-import { CreateHall, GetHalls, GetRequest, PaginationProps, UpdateHall } from '../../models/api';
+import { CreateHall, GetHalls, GetRequest, PaginationProps, UpdateHall, User } from '../../models/api';
 
 const serverAPI = createApi({
     reducerPath: 'serverAPI',
@@ -71,6 +71,12 @@ const serverAPI = createApi({
                 method: 'DELETE',
             }),
             invalidatesTags: ['Hall'],
+        }),
+        fetchUser: build.query<User, void>({
+            query: () => ({
+                url: `user`,
+                method: 'GET',
+            }),
         }),
     })
 })
