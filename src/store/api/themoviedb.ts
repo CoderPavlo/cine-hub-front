@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
-import { Genre, GetRequest, GetTrailerRequest, Movie, SearchRequest } from '../../models/movie';
+import { Genre, GetRequest, GetTrailerRequest, Movie, MovieDetail, Region, SearchRequest } from '../../models/movie';
 import { API_BASE_URL, API_KEY } from '../../helpers/apiConfig';
 
 export const themoviedbAPI = createApi({
@@ -32,6 +32,12 @@ export const themoviedbAPI = createApi({
                 method: 'GET',
             }),
         }),
+        fetchMovie: build.query<MovieDetail, number>({
+            query: (id) => ({
+                url: `movie/${id}?language=en-US&api_key=${API_KEY}`,
+                method: 'GET',
+            }),
+        }),
         search: build.query<GetRequest<Movie>, SearchRequest>({
             query: (data) => {
                 const params = new URLSearchParams();
@@ -44,13 +50,20 @@ export const themoviedbAPI = createApi({
                     params.append('primary_release_year', data.primary_release_year);
                 if (data.region)
                     params.append('region', data.region);
-                if (data.year)
-                    params.append('year', data.year);
+                const year = Number(data.year);
+                if (!isNaN(year) && year>1900 && year <= new Date().getFullYear())
+                    params.append('year', year.toString());
                 return {
                     url: `search/movie?${params.toString()}`,
                     method: 'GET',
                 };
             },
+        }),
+        fetchRegions: build.query<{results: Region[]}, void>({
+            query: () => ({
+                url: `watch/providers/regions?language=en-US&api_key=${API_KEY}`,
+                method: 'GET',
+            }),
         }),
     }),
 });
