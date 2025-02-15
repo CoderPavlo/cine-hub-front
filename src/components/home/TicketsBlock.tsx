@@ -4,6 +4,7 @@ import TicketCard from '../tickets/TicketCard';
 import { Ticket } from '../../models/tickets';
 import TicketDialog from '../tickets/TicketDialog';
 import TicketCardSkeleton from '../tickets/TicketCardSkeleton';
+import { useNavigate } from 'react-router-dom';
 
 
 export default function TicketsBlock() {
@@ -44,6 +45,7 @@ export default function TicketsBlock() {
     ];
 
     const [selectedTicket, setSelectedTicket] = useState<number | null>(null);
+    const navigate = useNavigate();
     return (
         <>
             <Typography variant="h5" gutterBottom color="textPrimary">
@@ -57,7 +59,7 @@ export default function TicketsBlock() {
                 ))}
             </Grid2>
             <Box my={2} display='flex' justifyContent='center'>
-                <Button variant="outlined">View all</Button>
+                <Button variant="outlined" onClick={()=>navigate('/tickets')}>View all</Button>
             </Box>
             <TicketDialog ticket={selectedTicket !=null ? tickets[selectedTicket] : undefined} onClose={() => setSelectedTicket(null)} open={selectedTicket != null}/>
             

@@ -15,6 +15,23 @@ export interface Movie {
     vote_count: number;
 }
 
+export interface MovieDetail {
+    adult: boolean;
+    backdrop_path: string;
+    genres: Genre[];
+    id: number;
+    original_language: string;
+    original_title: string;
+    overview: string;
+    popularity: number;
+    poster_path: string;
+    release_date: string;
+    title: string;
+    video: boolean;
+    vote_average: number;
+    vote_count: number;
+}
+
 export interface Genre {
     id: number,
     name: string,
@@ -43,6 +60,11 @@ export interface SearchRequest {
     include_adult?: boolean,
     primary_release_year?: string,
     page: number,
-    region?: string,
+    region?: string | null,
     year?: string,
+}
+
+export interface Region {
+    iso_3166_1: string,
+    english_name: string,
 }
