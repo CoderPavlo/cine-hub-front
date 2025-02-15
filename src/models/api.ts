@@ -35,3 +35,10 @@ export interface User {
     birthday: string,
     email: string,
 }
+
+export interface GetSessions extends PaginationProps {
+    cinemaId?: string,
+    hallId?: string,
+    filmId?: number,
+    date?: string,
+}

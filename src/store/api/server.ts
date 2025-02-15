@@ -1,8 +1,8 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { BASE_URL } from '../../helpers/apiConfig';
 import prepareHeaders from './prepareHeaders';
-import { Cinema, Hall } from '../../models/tables';
-import { CreateHall, GetHalls, GetRequest, PaginationProps, UpdateHall, User } from '../../models/api';
+import { Cinema, Hall, Session } from '../../models/tables';
+import { CreateHall, GetHalls, GetRequest, GetSessions, PaginationProps, UpdateHall, User } from '../../models/api';
 
 const serverAPI = createApi({
     reducerPath: 'serverAPI',
@@ -10,7 +10,7 @@ const serverAPI = createApi({
         baseUrl: BASE_URL + 'api/',
         prepareHeaders: prepareHeaders
     }),
-    tagTypes: ['Cinema', 'Hall'],
+    tagTypes: ['Cinema', 'Hall', 'Session'],
     endpoints: (build) => ({
         fetchCinemas: build.query<GetRequest<Cinema>, PaginationProps>({
             query: ({page, itemsPerPage}) => ({
@@ -43,10 +43,17 @@ const serverAPI = createApi({
             invalidatesTags: ['Cinema'],
         }),
         fetchHalls: build.query<GetRequest<Hall>, GetHalls>({
-            query: ({page, itemsPerPage, cinemaId}) => ({
-                url: `hall?itemsPerPage=${itemsPerPage}&page=${page}${cinemaId ? `&cinemaId=${cinemaId}` : ''}`,
-                method: 'GET',
-            }),
+            query: (data) => {
+                const params = new URLSearchParams();
+                Object.entries(data).forEach(([key, value]) => {
+                    if (value)
+                        params.append(key, String(value));
+                });
+                return {
+                    url: `hall?${params.toString()}`,
+                    method: 'GET',
+                };
+            },
             providesTags: ['Hall'],
         }),
         createHall: build.mutation<void, CreateHall>({
@@ -77,6 +84,20 @@ const serverAPI = createApi({
                 url: `user`,
                 method: 'GET',
             }),
+        }),
+        fetchSessions: build.query<GetRequest<Session>, GetSessions>({
+            query: (data) => {
+                const params = new URLSearchParams();
+                Object.entries(data).forEach(([key, value]) => {
+                    if (value)
+                        params.append(key, String(value));
+                });
+                return {
+                    url: `sessions?${params.toString()}`,
+                    method: 'GET',
+                };
+            },
+            providesTags: ['Session'],
         }),
     })
 })

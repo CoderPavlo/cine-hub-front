@@ -15,10 +15,12 @@ export default function HallsTab() {
         setOpen(false);
         setTimeout(() => setHall(undefined), 200);
     }
-    const [filter, setFilter] = useState<Cinema | null>(null);
+    const [filter, setFilter] = useState<{
+        cinema: Cinema | null,
+        pagination: PaginationProps
+    }>({ cinema: null, pagination: { page: 1, itemsPerPage: 10 } });
     const { data: cinemas, isLoading } = serverAPI.useFetchCinemasQuery({ page: 1, itemsPerPage: 10000 });
-    const [pagination, setPagination] = useState<PaginationProps>({ page: 1, itemsPerPage: 10 });
-    const { data, isFetching, error, refetch } = serverAPI.useFetchHallsQuery({ ...pagination, cinemaId: filter ? filter.id : undefined })
+    const { data, isFetching, error, refetch } = serverAPI.useFetchHallsQuery({ ...filter.pagination, cinemaId: filter.cinema ? filter.cinema.id : undefined })
     const [deleteQuery, { isLoading: deleteLoading, error: deleteError }] = serverAPI.useDeleteHallMutation();
     return (
         <Container maxWidth="lg">
@@ -29,8 +31,8 @@ export default function HallsTab() {
             <Paper sx={{ display: "flex", flexDirection: 'column', mb: 2, py: 2, px: 4 }}>
                 <Typography variant="h6">Filters</Typography>
                 <Autocomplete
-                    value={filter}
-                    onChange={(event, newValue) => setFilter(newValue)}
+                    value={filter.cinema}
+                    onChange={(event, newValue) => setFilter(prev => ({ cinema: newValue, pagination: { ...prev.pagination, page: 1 } }))}
                     options={cinemas ? cinemas.results : [] as Cinema[]}
                     getOptionLabel={(option) => option.location}
                     renderInput={(params) => <TextField {...params}
@@ -45,8 +47,15 @@ export default function HallsTab() {
                 data={data}
                 columns={['Name', 'Row Count', 'Seats Per Row', 'Cinema']}
                 values={item => [item.name, item.rowCount, item.seatsPerRow, item.cinemaName]}
-                filter={pagination}
-                onFilterChange={(name, value) => setPagination({ ...pagination, page: 1, [name]: value })}
+                filter={filter.pagination}
+                onFilterChange={(name, value) => setFilter(prev => ({
+                    cinema: prev.cinema,
+                    pagination: {
+                        ...prev.pagination,
+                        page: 1,
+                        [name]: value
+                    }
+                }))}
                 loading={isFetching}
                 error={Boolean(error)}
                 editOnClick={(item) => { setHall(item); setOpen(true) }}

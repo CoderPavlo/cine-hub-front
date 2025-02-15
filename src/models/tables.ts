@@ -17,7 +17,9 @@ export interface Session {
     endTime: string,
     formatType: string,
     price: number,
-    filmId: number,
+    filmId?: number,
     filmName: string,
-    hall: Hall,
+    cinemaLocation: string,
+    auditoriumName: string,
 }
+
