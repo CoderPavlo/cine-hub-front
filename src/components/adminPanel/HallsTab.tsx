@@ -1,4 +1,4 @@
-import { Box, Typography, Button, Paper, TableCell, Autocomplete, TextField, Container } from '@mui/material'
+import { Box, Typography, Button, Paper, Autocomplete, TextField, Container } from '@mui/material'
 import { useState } from 'react'
 import { Cinema, Hall } from '../../models/tables';
 import DeleteDialog from './DeleteDialog';

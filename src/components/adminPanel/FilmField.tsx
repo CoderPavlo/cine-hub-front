@@ -5,6 +5,7 @@ import Transitions from "../layout/Navbar/Transitions";
 import { themoviedbAPI } from "../../store/api/themoviedb";
 import LoadingComponent from "../common/LoadingComponent";
 import { BASE_IMG_URL } from "../../helpers/apiConfig";
+import { useAppDispatch } from "../../hooks/storeHooks";
 
 interface FilmFieldProps {
     error?: boolean,
@@ -12,12 +13,14 @@ interface FilmFieldProps {
     helperText?: string | false,
     idOnChange: (id: number) => void,
     nameOnChange: (name: string) => void,
+    runtimeOnChange: (runtime: number)=>void
 }
-const FilmField = ({ error, value, helperText, idOnChange, nameOnChange }: FilmFieldProps) => {
+const FilmField = ({ error, value, helperText, idOnChange, nameOnChange, runtimeOnChange }: FilmFieldProps) => {
     const [open, setOpen] = useState<boolean>(false);
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [filter, setFilter] = useState({ page: 1, query: '' });
     const { data, isFetching, error: searchError, refetch } = themoviedbAPI.useSearchQuery(filter);
+    const dispatch = useAppDispatch();
     return (
         <>
             <TextField
@@ -92,11 +95,18 @@ const FilmField = ({ error, value, helperText, idOnChange, nameOnChange }: FilmF
                                         >
                                             <Box height='300px' my={1} gap={1} overflow='scroll'>
                                             {data && data.results.map(movie =>
-                                                <button style={{ padding: 0, border: 'none', background: 'transparent', width: '100%', cursor: 'pointer' }}
-                                                    onClick={() => {
-                                                        idOnChange(movie.id);
-                                                        nameOnChange(movie.title);
-                                                        setOpen(false);
+                                                <button key={movie.id} style={{ padding: 0, border: 'none', background: 'transparent', width: '100%', cursor: 'pointer' }}
+                                                    onClick={async () => {
+                                                        const result = dispatch(themoviedbAPI.endpoints.fetchMovie.initiate(movie.id));
+                                                        try {
+                                                            const response = await result.unwrap();
+                                                            idOnChange(movie.id);
+                                                            nameOnChange(movie.title);
+                                                            runtimeOnChange(response.runtime);
+                                                            setOpen(false);
+                                                        } catch (err) {
+                                                            console.error('Error fetching movie:', err);
+                                                        }
                                                     }}>
                                                     <Card sx={{ display: 'flex', flexDirection: 'row' }}>
                                                             <CardMedia

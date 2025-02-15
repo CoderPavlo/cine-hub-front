@@ -9,6 +9,7 @@ import authAPI from "../../store/api/auth";
 import { IAuthResponse } from "../../models/auth";
 import { setTokens } from "../../store/slices/auth";
 import { useNavigate } from "react-router-dom";
+import serverAPI from "../../store/api/server";
 
 export default function LoginForm() {
   const [login, { isLoading, error }] = authAPI.useLoginMutation();
@@ -40,6 +41,7 @@ export default function LoginForm() {
       }).unwrap()
       .then((payload: IAuthResponse) => {
         dispatch(setTokens(payload));
+        dispatch(serverAPI.util.invalidateTags(['User']));
         navigate('/home');
       })
       .catch(async (error) => {

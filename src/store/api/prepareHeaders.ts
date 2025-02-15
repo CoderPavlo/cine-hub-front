@@ -12,9 +12,9 @@ export default async function prepareHeaders(headers: Headers): Promise<Headers>
             const response = await fetch(BASE_URL + 'auth/refresh/', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization' : `Bearer ${refreshToken}`
                 },
-                body: JSON.stringify({ token: refreshToken })
             });
 
             if (response.ok) {
@@ -24,12 +24,12 @@ export default async function prepareHeaders(headers: Headers): Promise<Headers>
             }
             else {
                 deleteTokens();
-                window.history.pushState(null, '', '/');
+                window.location.href = '/';
             }
         } catch (error) {
             console.error("Failed to refresh token:", error);
             deleteTokens();
-            window.history.pushState(null, '', '/');
+            window.location.href = '/';
         }
     }
 

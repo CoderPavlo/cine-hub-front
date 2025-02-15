@@ -3,8 +3,8 @@ import { Filter } from './FilterBlock';
 import dayjs, { Dayjs } from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import { Alert, Box, Button, Chip, Paper, Tab, Tabs, Typography } from '@mui/material';
-import { data } from './SessionsTab'
 import { useNavigate } from 'react-router-dom';
+import serverAPI from '../../store/api/server';
 dayjs.extend(duration);
 const generateDateArray = (date: Dayjs | null): Dayjs[] => {
     const today = dayjs().startOf('day');
@@ -13,6 +13,9 @@ const generateDateArray = (date: Dayjs | null): Dayjs[] => {
     return Array.from({ length: 14 }, (_, i) => baseDate.subtract(pastDays, 'day').add(i, 'day'));
 };
 
+const isEqual = (date1: Dayjs, date2: Dayjs) => {
+    return date1.year === date2.year && date1.month === date2.month && date1.date === date2.date;
+}
 const IntervalAlert = ({ start, end }: { start: Dayjs, end: Dayjs }) => {
     const diff = dayjs.duration(end.diff(start));
     const hours = `${diff.hours()} hour${diff.hours() !== 1 ? 's' : ''} `;
@@ -39,6 +42,13 @@ const SheduleForm = ({ filter, home }: SheduleFormProps) => {
         setSelectedDate(index);
     }, [filter.date]);
     const [selectedDate, setSelectedDate] = useState(0);
+    const {data} = serverAPI.useFetchSessionsQuery({
+        page: 1,
+        itemsPerPage: 10000,
+        cinemaId: filter.cinema ? filter.cinema.id : undefined,
+        hallId: filter.hall ? filter.hall.id : undefined,
+        date: dateList[selectedDate].toISOString(),
+    });
     return (
         <Paper
             sx={{
@@ -79,18 +89,18 @@ const SheduleForm = ({ filter, home }: SheduleFormProps) => {
                         ))}
                     </Tabs>
                     <Box display='flex' flexDirection='column' gap={1}>
-
-                        {data.length > 0 ?
+                        
+                        {data && data.results.length > 0 ?
                             <>
-                                {dayjs(data[0].startTime).startOf('day').isSame(dateList[selectedDate].startOf('day')) &&
-                                    <IntervalAlert start={dateList[selectedDate].set('hour', 0).set('minute', 0)} end={dayjs(data[0].startTime)} />
+                                {isEqual(dayjs(data.results[0].startTime), dateList[selectedDate]) &&
+                                    <IntervalAlert start={dayjs(data.results[0].startTime).set('hour', 0).set('minute', 0)} end={dayjs(data.results[0].startTime)} />
                                 }
                             </>
                             :
                             <IntervalAlert start={dateList[selectedDate].set('hour', 0).set('minute', 0)} end={dateList[selectedDate].set('hour', 23).set('minute', 59)} />
 
                         }
-                        {data.map((item, index) =>
+                        {data && data.results.map((item, index) =>
                             <>
                                 <Box display='flex' flexDirection='row' alignItems='center' gap={1}>
                                     <Chip
@@ -106,12 +116,12 @@ const SheduleForm = ({ filter, home }: SheduleFormProps) => {
                                     />
                                     <Typography variant="body1">{item.filmName}</Typography>
                                 </Box>
-                                {index !== data.length - 1 &&
-                                    <IntervalAlert start={dayjs(item.endTime)} end={dayjs(data[index + 1].startTime)} />
+                                {index !== data.results.length - 1 &&
+                                    <IntervalAlert start={dayjs(item.endTime)} end={dayjs(data.results[index + 1].startTime)} />
                                 }
                             </>
                         )}
-                        {data.length > 0 && dayjs(data[data.length - 1].endTime).startOf('day').isSame(dateList[selectedDate].startOf('day')) && <IntervalAlert start={dayjs(data[data.length - 1].endTime)} end={dateList[selectedDate].set('hour', 23).set('minute', 59)} />}
+                        {(data && data.results.length > 0) && isEqual(dayjs(data.results[data.results.length - 1].endTime),dateList[selectedDate]) && <IntervalAlert start={dayjs(data.results[data.results.length - 1].endTime)} end={dayjs(data.results[data.results.length - 1].endTime).set('hour', 23).set('minute', 59)} />}
                     </Box>
                     {home &&
                         <Box mt={1} display='flex' justifyContent='center'>

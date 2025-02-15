@@ -1,124 +1,14 @@
-import { Box, Button, Grid2, IconButton, Pagination, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Tooltip, Typography } from "@mui/material"
-import { Cinema, Hall, Session } from "../../models/tables";
-import { useEffect, useState } from "react";
-import { Edit, Delete } from "@mui/icons-material";
+import { Box, Button, Grid2, Typography } from "@mui/material"
+import { Session } from "../../models/tables";
+import { useState } from "react";
 import dayjs from "dayjs";
 import DeleteDialog from "./DeleteDialog";
 import SessionDialog from "./SessionDialog";
 import FilterBlock, { Filter } from "./FilterBlock";
 import SheduleForm from "./SheduleForm";
-import { useSearchParams } from "react-router-dom";
 import serverAPI from "../../store/api/server";
 import { PaginationProps } from "../../models/api";
 import AdminTable from "./AdminTable";
-export const cinemas: Cinema[] = [
-    { id: '1', location: 'Kyiv, Ocean Plaza' }
-];
-export const halls: Hall[] = [
-    {
-        id: "101",
-        name: "IMAX",
-        rowCount: 12,
-        seatsPerRow: 20,
-        cinema: { id: "1", location: "Kyiv, Ocean Plaza" },
-    },
-    {
-        id: "102",
-        name: "VIP Lounge",
-        rowCount: 8,
-        seatsPerRow: 15,
-        cinema: { id: "1", location: "Kyiv, Ocean Plaza" },
-    },
-    {
-        id: "103",
-        name: "Standard Hall 1",
-        rowCount: 10,
-        seatsPerRow: 18,
-        cinema: { id: "1", location: "Kyiv, Ocean Plaza" },
-    },
-    {
-        id: "104",
-        name: "Standard Hall 2",
-        rowCount: 10,
-        seatsPerRow: 18,
-        cinema: { id: "1", location: "Kyiv, Ocean Plaza" },
-    },
-    {
-        id: "105",
-        name: "4DX",
-        rowCount: 6,
-        seatsPerRow: 12,
-        cinema: { id: "1", location: "Kyiv, Ocean Plaza" },
-    }
-];
-
-export const data: Session[] = [
-    {
-        id: "201",
-        startTime: "2025-02-12T10:00:00",
-        endTime: "2025-02-12T12:30:00",
-        formatType: "IMAX 3D",
-        price: 300,
-        filmId: 1,
-        filmName: "Avatar 2",
-        hall: {
-            id: "101",
-            name: "IMAX",
-            rowCount: 12,
-            seatsPerRow: 20,
-            cinema: { id: "1", location: "Kyiv, Ocean Plaza" },
-        },
-    },
-    {
-        id: "202",
-        startTime: "2025-02-12T13:00:00",
-        endTime: "2025-02-12T15:15:00",
-        formatType: "2D",
-        price: 200,
-        filmId: 2,
-        filmName: "Dune: Part Two",
-        hall: {
-            id: "103",
-            name: "Standard Hall 1",
-            rowCount: 10,
-            seatsPerRow: 18,
-            cinema: { id: "1", location: "Kyiv, Ocean Plaza" },
-        },
-    },
-
-    {
-        id: "204",
-        startTime: "2025-02-12T19:00:00",
-        endTime: "2025-02-12T21:30:00",
-        formatType: "4DX",
-        price: 350,
-        filmId: 4,
-        filmName: "John Wick 4",
-        hall: {
-            id: "105",
-            name: "4DX",
-            rowCount: 6,
-            seatsPerRow: 12,
-            cinema: { id: "1", location: "Kyiv, Ocean Plaza" },
-        },
-    },
-    {
-        id: "205",
-        startTime: "2025-02-12T22:00:00",
-        endTime: "2025-02-13T00:30:00",
-        formatType: "IMAX 2D",
-        price: 280,
-        filmId: 5,
-        filmName: "The Batman",
-        hall: {
-            id: "101",
-            name: "IMAX",
-            rowCount: 12,
-            seatsPerRow: 20,
-            cinema: { id: "1", location: "Kyiv, Ocean Plaza" },
-        },
-    },
-];
 
 const SessionsTab = () => {
     const [open, setOpen] = useState(false);
@@ -135,6 +25,7 @@ const SessionsTab = () => {
         hallId: filter.values.hall ? filter.values.hall.id : undefined,
         date: filter.values.date ? filter.values.date.toISOString() : undefined,
     });
+    const [deleteQuery, { isLoading: deleteLoading, error: deleteError }] = serverAPI.useDeleteSessionMutation();
     return (
         <Grid2 container px={{ md: '24px' }} columnSpacing={2}>
             <Grid2 size={12}>
@@ -172,9 +63,15 @@ const SessionsTab = () => {
                 <SheduleForm filter={filter.values} />
             </Grid2>
             <SessionDialog open={open} onClose={handleClose} session={session} filter={filter.values} />
-            <DeleteDialog open={deleteSession != undefined} onClose={() => setDeleteSession(undefined)} onClick={() => setDeleteSession(undefined)}
+            <DeleteDialog open={deleteSession != undefined} onClose={() => setDeleteSession(undefined)}
                 type='session' name={`Film: ${deleteSession?.filmName}\nCinema: ${deleteSession?.cinemaLocation}\nHall: ${deleteSession?.auditoriumName}\nDate: ${dayjs(deleteSession?.startTime).format('ddd DD MMM HH:mm')}`}
-            />
+                onClick={async () => {
+                    await deleteQuery(deleteSession?.id || '').then(() => {
+                        if (deleteError === undefined) setDeleteSession(undefined);
+                    })
+                }}
+                loading={deleteLoading} error={deleteError}
+           />
         </Grid2>
     )
 }

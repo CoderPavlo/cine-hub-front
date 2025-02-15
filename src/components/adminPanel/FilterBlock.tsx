@@ -1,5 +1,5 @@
 import dayjs, { Dayjs } from 'dayjs'
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Cinema, Hall } from '../../models/tables'
 import { Paper, Typography, Grid2, Autocomplete, TextField, Skeleton } from '@mui/material'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'

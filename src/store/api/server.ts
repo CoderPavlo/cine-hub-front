@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 import { BASE_URL } from '../../helpers/apiConfig';
 import prepareHeaders from './prepareHeaders';
 import { Cinema, Hall, Session } from '../../models/tables';
-import { CreateHall, GetHalls, GetRequest, GetSessions, PaginationProps, UpdateHall, User } from '../../models/api';
+import { CreateHall, CreateSessions, GetHalls, GetRequest, GetSessions, PaginationProps, UpdateHall, UpdateSession, User } from '../../models/api';
 
 const serverAPI = createApi({
     reducerPath: 'serverAPI',
@@ -10,7 +10,7 @@ const serverAPI = createApi({
         baseUrl: BASE_URL + 'api/',
         prepareHeaders: prepareHeaders
     }),
-    tagTypes: ['Cinema', 'Hall', 'Session'],
+    tagTypes: ['Cinema', 'Hall', 'Session', 'User'],
     endpoints: (build) => ({
         fetchCinemas: build.query<GetRequest<Cinema>, PaginationProps>({
             query: ({page, itemsPerPage}) => ({
@@ -84,6 +84,7 @@ const serverAPI = createApi({
                 url: `user`,
                 method: 'GET',
             }),
+            providesTags: ['User'],
         }),
         fetchSessions: build.query<GetRequest<Session>, GetSessions>({
             query: (data) => {
@@ -98,6 +99,29 @@ const serverAPI = createApi({
                 };
             },
             providesTags: ['Session'],
+        }),
+        createSessions: build.mutation<void, CreateSessions>({
+            query: (data) => ({
+                url: 'sessions',
+                method: 'POST',
+                body: data,
+            }),
+            invalidatesTags: ['Session'],
+        }),
+        updateSession: build.mutation<void, UpdateSession>({
+            query: ({ id, ...data }) => ({
+                url: `sessions/${id}`,
+                method: 'PUT',
+                body: data,
+            }),
+            invalidatesTags: ['Session'],
+        }),
+        deleteSession: build.mutation<void, string>({
+            query: (id) => ({
+                url: `sessions/${id}`,
+                method: 'DELETE',
+            }),
+            invalidatesTags: ['Session'],
         }),
     })
 })

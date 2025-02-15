@@ -1,4 +1,4 @@
-import { Box, Typography, Button, TableCell, Container } from '@mui/material'
+import { Box, Typography, Button, Container } from '@mui/material'
 import { useState } from 'react'
 import CinemaDialog from './CinemaDialog';
 import { Cinema } from '../../models/tables';

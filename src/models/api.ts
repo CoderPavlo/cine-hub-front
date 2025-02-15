@@ -42,3 +42,25 @@ export interface GetSessions extends PaginationProps {
     filmId?: number,
     date?: string,
 }
+
+export interface CreateSessions {
+    startDateTime: string,
+    endDate?: string,
+    runtime: number,
+    formatType: string,
+    price: number,
+    filmId: number,
+    filmName: string,
+    cinemaId: string,
+    auditoriumId: string,
+}
+
+export interface UpdateSession {
+    id: string,
+    startTime: string,
+    runtime: number,
+    formatType: string,
+    price: number,
+    filmId: number,
+    filmName: string,
+}
