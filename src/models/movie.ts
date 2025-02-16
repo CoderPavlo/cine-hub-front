@@ -30,13 +30,7 @@ export interface MovieDetail {
     video: boolean;
     vote_average: number;
     vote_count: number;
-}
-
-export interface GetRequest<T> {
-    page: number,
-    results: T[],
-    total_pages: number,
-    total_results: number,
+    runtime: number;
 }
 
 export interface Genre {

@@ -15,6 +15,7 @@ import { ReactNode, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '../../../hooks/storeHooks.ts';
 import { useNavigate } from 'react-router-dom';
 import { clearTokens } from '../../../store/slices/auth.ts';
+import serverAPI from '../../../store/api/server.ts';
 
 interface ITabPanelProps {
     children: ReactNode,
@@ -46,6 +47,7 @@ export default function Profile() {
     const [value, setValue] = useState<number>(isLogged ? 0 : 1);
     const dispatch=useAppDispatch();
     const navigate = useNavigate();
+    const {data} = serverAPI.useFetchUserQuery();
     return (
         <>
             <ButtonBase onClick={(e) => {
@@ -94,11 +96,13 @@ export default function Profile() {
                                                 <Grid container justifyContent="space-between" alignItems="center">
                                                     <Grid>
                                                         <Stack direction="row" spacing={1.25} alignItems="center">
-                                                            <Avatar src={"baseUrl + data?.avatar"} alt={"data?.name"} sx={{ width: 32, height: 32 }} />
+                                                            <Avatar sx={{ width: 32, height: 32 }}>
+                                                                {data?.name[0]}
+                                                            </Avatar>
                                                             <Stack>
-                                                                <Typography variant="h6">{"data?.name"}</Typography>
+                                                                <Typography variant="h6">{`${data?.name} ${data?.surname}`}</Typography>
                                                                 <Typography variant="body2" color="textSecondary">
-                                                                    {"data?.email"}
+                                                                    {data?.email}
                                                                 </Typography>
                                                             </Stack>
                                                         </Stack>

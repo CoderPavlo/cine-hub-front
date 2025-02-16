@@ -1,6 +1,6 @@
 import Cookies from "js-cookie";
 import { IAuthResponse } from "../../models/auth";
-import { saveTokens } from "../slices/auth";
+import { deleteTokens, saveTokens } from "../slices/auth";
 import { BASE_URL } from "../../helpers/apiConfig";
 
 export default async function prepareHeaders(headers: Headers): Promise<Headers> {
@@ -9,12 +9,12 @@ export default async function prepareHeaders(headers: Headers): Promise<Headers>
 
     if (!accessToken && refreshToken) {
         try {
-            const response = await fetch(BASE_URL + '/auth/refresh/', {
+            const response = await fetch(BASE_URL + 'auth/refresh/', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization' : `Bearer ${refreshToken}`
                 },
-                body: JSON.stringify({ token: refreshToken })
             });
 
             if (response.ok) {
@@ -22,8 +22,14 @@ export default async function prepareHeaders(headers: Headers): Promise<Headers>
                 saveTokens(auth);
                 accessToken = auth.accessToken;
             }
+            else {
+                deleteTokens();
+                window.location.href = '/';
+            }
         } catch (error) {
             console.error("Failed to refresh token:", error);
+            deleteTokens();
+            window.location.href = '/';
         }
     }
 
