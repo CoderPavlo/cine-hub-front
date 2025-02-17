@@ -148,7 +148,7 @@ const MovieSessions = ({ movieId }: { movieId: number }) => {
             <AccordionDetails>
               {Object.entries(groupByFormat(sessions)).map(([format, sessionsByFormat]) => (
                 <Fragment key={format}>
-                  <Box sx={{ mb: "8px" }}>
+                  <Box sx={{ mb: "4px" }}>
                     <Typography
                       variant="subtitle2"
                       sx={{
@@ -173,6 +173,7 @@ const MovieSessions = ({ movieId }: { movieId: number }) => {
                       display: "flex",
                       flexWrap: "wrap",
                       gap: 2,
+                      mb: 2
                     }}
                   >
                     {sessionsByFormat.map((session, index) => (
