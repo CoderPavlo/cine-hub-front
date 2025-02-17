@@ -64,32 +64,6 @@ export default function Navbar() {
           <Box sx={{ display: { xs: 'none', sm: 'block' } }}>
             {logo}
           </Box>
-          {role != 'Admin' &&
-            <Box display='flex' flexDirection='row' alignItems='center'>
-              <LocationOn fontSize="medium" />
-              <Autocomplete
-                value={data.find(item => item.id === cinema)}
-                onChange={(event, newValue) => {
-                  if (newValue) {
-                    Cookies.set('cinema', newValue.id);
-                    setCinema(newValue.id);
-                  }
-                }}
-                options={data}
-                getOptionLabel={(option) => option.location}
-                renderInput={(params) => <TextField {...params}
-                  size="medium"
-                  sx={{
-                    width: '200px'
-                  }}
-                  variant="standard"
-                />}
-                noOptionsText='There are no cinema'
-                isOptionEqualToValue={(option, value) => option.id === value.id}
-                sx={{ ml: 1 }}
-              />
-            </Box>
-          }
           <Box display='flex' flexDirection='row'>
             <Box sx={{ display: { xs: 'none', sm: 'flex' }, mr: 3 }} alignItems='center'>
               {pages.map((item) => (

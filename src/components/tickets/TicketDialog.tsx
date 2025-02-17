@@ -2,6 +2,7 @@ import { Close } from '@mui/icons-material'
 import { Dialog, DialogTitle, IconButton, DialogContent, Stack, Typography, useTheme } from '@mui/material'
 import { QRCodeSVG } from 'qrcode.react'
 import { Ticket } from '../../models/tickets';
+import dayjs from 'dayjs';
 
 interface TicketDialogProps {
     ticket?: Ticket,
@@ -43,15 +44,21 @@ export default function TicketDialog({ ticket, onClose, open }: TicketDialogProp
                     <Stack direction='row'>
                         <QRCodeSVG value={ticket.id} size={300} bgColor={theme.palette.background.paper} fgColor={theme.palette.text.primary} />
                         <Stack direction='column' ml={1} textAlign='center' spacing={1}>
-                            <Typography variant="h5">{ticket.title}</Typography>
+                            <Typography variant="h5">{ticket.filmName}</Typography>
                             <Typography variant="body1" color="textSecondary">
-                                {ticket.date} at {ticket.time}
+                                 {dayjs(ticket.startTime).format('ddd DD MMM')} at {dayjs(ticket.startTime).format('HH:mm')}
                             </Typography>
                             <Typography variant="body1">
-                                Hall: {ticket.hall}, Row: {ticket.row_number}, Seat: {ticket.seat_number}
+                                Cinema: {ticket.cinemaLocation}
                             </Typography>
                             <Typography variant="body1">
-                                Type: {ticket.type}
+                                Hall: {ticket.hallName}
+                            </Typography>
+                            <Typography variant="body1">
+                                Row: {ticket.rowNumber}, Seat: {ticket.seatNumber}
+                            </Typography>
+                            <Typography variant="body1">
+                                Type: {ticket.formatType}
                             </Typography>
                             <Typography variant="body1" color="textSecondary">
                                 Price: ${ticket.price}

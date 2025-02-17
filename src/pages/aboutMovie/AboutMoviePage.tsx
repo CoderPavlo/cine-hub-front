@@ -428,7 +428,7 @@ export default function AboutMoviePage() {
               Schedule of sessions
             </Typography>
             <Box sx={{ p: 2, bgcolor: "background.default", borderRadius: 2 }}>
-              <MovieSessions movieId={movieId} />
+              <MovieSessions movieId={Number(movieId)}/>
             </Box>
           </Paper>
         </Grid2>

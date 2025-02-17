@@ -3,6 +3,7 @@ import { BASE_URL } from '../../helpers/apiConfig';
 import prepareHeaders from './prepareHeaders';
 import { Cinema, Hall, Session } from '../../models/tables';
 import { CreateHall, CreateSessions, GetHalls, GetRequest, GetSessions, PaginationProps, UpdateHall, UpdateSession, User } from '../../models/api';
+import { CreateTicket, SessionDetail, Ticket, TicketSeat } from '../../models/tickets';
 
 const serverAPI = createApi({
     reducerPath: 'serverAPI',
@@ -10,7 +11,7 @@ const serverAPI = createApi({
         baseUrl: BASE_URL + 'api/',
         prepareHeaders: prepareHeaders
     }),
-    tagTypes: ['Cinema', 'Hall', 'Session', 'User'],
+    tagTypes: ['Cinema', 'Hall', 'Session', 'User', 'Ticket'],
     endpoints: (build) => ({
         fetchCinemas: build.query<GetRequest<Cinema>, PaginationProps>({
             query: ({page, itemsPerPage}) => ({
@@ -122,6 +123,28 @@ const serverAPI = createApi({
                 method: 'DELETE',
             }),
             invalidatesTags: ['Session'],
+        }),
+        fetchTickets: build.query<GetRequest<Ticket>, PaginationProps>({
+            query: ({page, itemsPerPage}) => ({
+                url: `tickets?itemsPerPage=${itemsPerPage}&page=${page}`,
+                method: 'GET',
+            }),
+            providesTags: ['Ticket'],
+        }),
+        createTicket: build.mutation<void, CreateTicket>({
+            query: (data) => ({
+                url: 'tickets',
+                method: 'POST',
+                body: data,
+            }),
+            invalidatesTags: ['Ticket'],
+        }),
+        fetchReserved: build.query<SessionDetail, string>({
+            query: (id) => ({
+                url: `tickets/reserved?sessionId=${id}`,
+                method: 'GET',
+            }),
+            providesTags: ['Ticket'],
         }),
     })
 })

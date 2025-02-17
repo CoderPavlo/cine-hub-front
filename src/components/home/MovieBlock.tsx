@@ -1,9 +1,10 @@
 import { useEffect } from 'react'
-import { Genre, GetRequest, Movie } from '../../models/movie'
+import { Genre, Movie } from '../../models/movie'
 import { Typography, Grid2, Pagination } from '@mui/material';
 import LoadingComponent from '../common/LoadingComponent';
 import MovieCard from './MovieCard';
 import MovieCardSkeleton from './MovieCardSkeleton';
+import { GetRequest } from '../../models/api';
 interface MovieBlockProps {
   title: string,
   page: number,

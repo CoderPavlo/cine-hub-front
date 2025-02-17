@@ -1,10 +1,10 @@
 import { Card, CardContent, CardMedia, Chip, Grid2, Link, Stack, Typography, useTheme } from "@mui/material";
-import { Session } from "../../pages/SchedulePage";
 import { themoviedbAPI } from "../../store/api/themoviedb";
 import { BASE_IMG_URL } from "../../helpers/apiConfig";
 import dayjs from "dayjs";
 import LoadingComponent from "../common/LoadingComponent";
 import SessionCardSkeleton from "./SessionCardSkeleton";
+import { Session } from "../../models/tables";
 
 interface SessionsCardProps {
     item: { filmId: number; sessions: Session[] },

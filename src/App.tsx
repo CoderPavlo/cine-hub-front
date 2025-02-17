@@ -48,19 +48,16 @@ function App() {
 
                 <Route path="/schedule" element={<SchedulePage />} />
                 <Route path="/search" element={<SearchPage />} />
-                
+                <Route path="/movie/:id" element={<AboutMoviePage />} />
+                {/*Movie details page*/}
+                <Route path="/cart/seatplan" element={<SeatBookingPage />} />
             {role === "User" && (
               <>
                 {/*Home page for user*/}
                 <Route path="/home" element={<HomePage />} />
                 {/*Session schedule page for user*/}
-                <Route path="/movie/:id" element={<AboutMoviePage />} />
-                {/*Movie details page*/}
-                <Route path="/session/:id" element={<div />} />
+               
                 {/*Session details page for user*/}
-                <Route path="/cart/seatplan" element={<SeatBookingPage />} />
-                {/*Session details page for user*/}
-                <Route path="/booking/:id" element={<div />} />
                 {/*Booking page for user*/}
                 <Route path="/profile" element={<div />} /> {/*Profile page*/}
                 <Route path="/tickets" element={<TicketPage />} />

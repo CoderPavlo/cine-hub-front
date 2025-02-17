@@ -3,6 +3,7 @@ import { Download, Share } from '@mui/icons-material'
 import { CardContent, Typography, Box, Tooltip, IconButton, useTheme, Badge, BadgeProps, styled } from '@mui/material'
 import { QRCodeSVG } from 'qrcode.react'
 import { StyledCard } from '../home/MovieCard'
+import dayjs from 'dayjs'
 
 export const StyledBadge = styled(Badge)<BadgeProps>(({ theme }) => ({
   '& .MuiBadge-badge': {
@@ -21,14 +22,17 @@ export default function TicketCard({ ticket, onClick }: TicketCardProps) {
   return (
     <button style={{ padding: 0, border: 'none', background: 'transparent', width: '100%', cursor: 'pointer' }} onClick={onClick}>
       <StyledCard>
-        <StyledBadge badgeContent={ticket.type} color="primary">
+        <StyledBadge badgeContent={ticket.formatType} color="primary">
           <CardContent sx={{ width: '100%' }}>
-            <Typography variant="h5">{ticket.title}</Typography>
+            <Typography variant="h5">{ticket.filmName}</Typography>
             <Typography variant="body1" color="textSecondary">
-              {ticket.date} at {ticket.time}
+              {dayjs(ticket.startTime).format('ddd DD MMM')} at {dayjs(ticket.startTime).format('HH:mm')}
             </Typography>
             <Typography variant="body1">
-              Hall: {ticket.hall}, Row: {ticket.row_number}, Seat: {ticket.seat_number}
+              Cinema: {ticket.cinemaLocation}, Hall: {ticket.hallName}
+            </Typography>
+            <Typography variant="body1">
+              Row: {ticket.rowNumber}, Seat: {ticket.seatNumber}
             </Typography>
             <Box sx={{ mt: 2, display: "flex", gap: 1 }}>
               <QRCodeSVG value={ticket.id} size={64} bgColor={theme.palette.background.paper} fgColor={theme.palette.text.primary} />
