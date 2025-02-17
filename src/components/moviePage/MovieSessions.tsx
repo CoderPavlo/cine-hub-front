@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import {
   Box,
   Tabs,
@@ -9,29 +9,35 @@ import {
   Typography,
   Chip,
   useTheme,
-  Tooltip,
 } from "@mui/material";
-import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import { useNavigate } from "react-router-dom";
-import { generateSessions, Session } from "../../helpers/lib/sessionsGenerator";
-
-// Data of movie sessions for demo
-const mockSessions = generateSessions();
-console.log("mockSessions:");
-console.log(mockSessions);
-
-const formatDescription = {
-  SDH: "Subtitles for the Deaf or Hard-of-Hearing",
-  LUX: "A session on recliner chairs that provide increased viewing comfort for movie enthusiasts",
-  VIP: "A session in a separate hall with the option of waiter service directly during the session",
-};
-
-const MovieSessions = ({ movieId }: { movieId: string }) => {
+import dayjs from "dayjs";
+import { Session } from "../../models/tables";
+import { GetRequest } from "../../models/api";
+import { BASE_URL } from "../../helpers/apiConfig";
+const groupByCinema = (sessions: Session[]) => {
+  return sessions.reduce((acc, session) => {
+    if (!acc[session.cinemaLocation]) {
+      acc[session.cinemaLocation] = [];
+    }
+    acc[session.cinemaLocation].push(session);
+    return acc;
+  }, {} as Record<string, typeof sessions>)
+}
+const groupByFormat = (sessions: Session[]) => {
+  return sessions.reduce((acc, session) => {
+    if (!acc[session.formatType]) {
+      acc[session.formatType] = [];
+    }
+    acc[session.formatType].push(session);
+    return acc;
+  }, {} as Record<string, typeof sessions>)
+}
+const MovieSessions = ({ movieId }: { movieId: number }) => {
   const theme = useTheme();
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState(0);
-  const [expandedCinema, setExpandedCinema] = useState<string | false>(false);
 
   // Movie sessions dates
   const dates = Array.from({ length: 7 }, (_, i) => {
@@ -40,61 +46,17 @@ const MovieSessions = ({ movieId }: { movieId: string }) => {
     return date;
   });
 
-  // Movie sessions on particular date
-  const filteredSessions = mockSessions.filter(
-    (session) =>
-      session.date === dates[selectedDate].toISOString().split("T")[0]
-  );
-
-  // Grouping sessions by cinema
-  console.log("Filtered Sessions:");
-  console.log(filteredSessions);
-
-  const groupedSessions = filteredSessions.reduce((acc, session) => {
-    if (!acc[session.cinema]) {
-      acc[session.cinema] = [];
-    }
-    acc[session.cinema].push(session);
-    return acc;
-  }, {} as Record<string, typeof mockSessions>);
-
-  console.log("groupedSessions:");
-  console.log(groupedSessions);
-
   const handleDateChange = (event: React.SyntheticEvent, newValue: number) => {
     setSelectedDate(newValue);
   };
-
-  const handleCinemaChange =
-    (cinema: string) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-      setExpandedCinema(isExpanded ? cinema : false);
-    };
-
-  const handleSessionTimeClick = (
-    event: React.SyntheticEvent,
-    time: string,
-    session: Session
-  ) => {
-    //   "cinema": "Respublika Park IMAX",
-    // "location": "ул. Киевская, 15",
-    // "auditorium": "Зал #4",
-    // "datetime": "2025-02-01T16:30:00",
-    // "format": "IMAX 3D",
-
-    // User choice of session data
-
-    const posterUrl = document.getElementById("moviePoster")?.src;
-    const movieName = document.getElementById("movieName")?.textContent;
-
-    const { times, ...rest } = session;
-    const userSessionInfo = { ...rest, time, posterUrl, movieName, movieId };
-    console.log("userSessionInfo:");
-    console.log(userSessionInfo);
-
-    event.preventDefault();
-    navigate(`/cart/seatplan`, { state: userSessionInfo });
-  };
-
+  // navigate(`/cart/seatplan`, { state: userSessionInfo });
+  const [data, setData] = useState<GetRequest<Session> | undefined>(undefined);
+  useEffect(() => {
+    fetch(`${BASE_URL}api/sessions?page=1&itemsPerPage=10000&date=${dates[selectedDate].toISOString()}&filmId=${movieId}`)
+      .then((response) => response.json())
+      .then((data) => setData(data))
+      .catch((error) => console.error("Failed to fetch movie data:", error));
+  }, [movieId, selectedDate]);
   return (
     <Box>
       <Typography
@@ -105,8 +67,6 @@ const MovieSessions = ({ movieId }: { movieId: string }) => {
       >
         Choose date:
       </Typography>
-
-      {/* Different dates tabs */}
       <Tabs
         value={selectedDate}
         onChange={handleDateChange}
@@ -138,8 +98,6 @@ const MovieSessions = ({ movieId }: { movieId: string }) => {
           />
         ))}
       </Tabs>
-
-      {/* List of cinemas & sessions */}
       <Box
         sx={{
           maxHeight: { xs: "auto", lg: "calc(100vh - 390px)" },
@@ -147,11 +105,9 @@ const MovieSessions = ({ movieId }: { movieId: string }) => {
           scrollbarWidth: "thin",
         }}
       >
-        {Object.entries(groupedSessions).map(([cinema, sessions]) => (
+        {data && Object.entries(groupByCinema(data.results)).map(([cinema, sessions]) => (
           <Accordion
             key={cinema}
-            // expanded={expandedCinema === cinema}
-            // onChange={handleCinemaChange(cinema)}
             sx={{
               mb: 2,
               borderRadius: "8px",
@@ -190,15 +146,8 @@ const MovieSessions = ({ movieId }: { movieId: string }) => {
               <Typography sx={{ fontWeight: 600 }}>{cinema}</Typography>
             </AccordionSummary>
             <AccordionDetails>
-              {sessions.map((session) => (
-                <Box
-                  key={session.id}
-                  sx={{
-                    "&:not(:last-child)": {
-                      mb: "25px",
-                    },
-                  }}
-                >
+              {Object.entries(groupByFormat(sessions)).map(([format, sessionsByFormat]) => (
+                <Fragment key={format}>
                   <Box sx={{ mb: "8px" }}>
                     <Typography
                       variant="subtitle2"
@@ -210,33 +159,14 @@ const MovieSessions = ({ movieId }: { movieId: string }) => {
                     >
                       Format:
                     </Typography>
-                    {session.format.split(" ").map((f: string, i: number) => (
-                      <Tooltip
-                        key={i}
-                        title={`${formatDescription[f]}`}
-                        arrow
-                        placement="top"
-                      >
-                        <Chip
-                          label={f}
-                          component="span"
-                          size="small"
-                          icon={
-                            <QuestionMarkIcon
-                              sx={{
-                                fill: "white",
-                              }}
-                            />
-                          }
-                          sx={{
-                            mr: 1,
-                            "& .MuiChip-icon": {
-                              fontSize: "10px",
-                            },
-                          }}
-                        />
-                      </Tooltip>
-                    ))}
+                    <Chip
+                      label={format}
+                      component="span"
+                      size="small"
+                      sx={{
+                        mr: 1,
+                      }}
+                    />
                   </Box>
                   <Box
                     sx={{
@@ -245,14 +175,12 @@ const MovieSessions = ({ movieId }: { movieId: string }) => {
                       gap: 2,
                     }}
                   >
-                    {session.times.map((time) => (
+                    {sessionsByFormat.map((session, index) => (
                       <Chip
-                        key={time}
-                        label={time}
+                        key={index}
+                        label={dayjs(session.startTime).format('HH:mm')}
                         variant="outlined"
-                        onClick={(e) =>
-                          handleSessionTimeClick(e, time, session)
-                        }
+                        onClick={() => navigate(`/cart/seatplan?id=${session.id}`)}
                         component="a"
                         href={"#"}
                         clickable
@@ -269,14 +197,14 @@ const MovieSessions = ({ movieId }: { movieId: string }) => {
                       />
                     ))}
                   </Box>
-                </Box>
+                </Fragment>
               ))}
             </AccordionDetails>
           </Accordion>
         ))}
       </Box>
 
-      {filteredSessions.length === 0 && (
+      {data && data.results.length === 0 && (
         <Typography color="error" sx={{ textAlign: "center", my: 2 }}>
           No sessions. PLease, choose another date
         </Typography>

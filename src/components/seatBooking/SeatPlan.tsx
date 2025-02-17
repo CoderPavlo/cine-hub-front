@@ -7,43 +7,39 @@ import {
   Divider,
   Box,
   Tooltip,
+  useTheme,
+  alpha,
 } from "@mui/material";
 import ClearIcon from "@mui/icons-material/Clear";
 import { Chair } from "@mui/icons-material";
-import { useTheme } from "@emotion/react";
-import { Seat } from "../../pages/seatBooking/SeatBookingPage";
+import { TicketSeat } from "../../models/tickets";
 
 const SeatPlan = ({
+  rows,
   seats,
+  price,
+  reservedSeats,
+  selectedSeats,
   handleSeatClick,
 }: {
-  seats: Record<number, Seat[]>;
-  handleSeatClick: (seat: Seat) => void;
+  rows: number,
+  seats: number,
+  price: number,
+  reservedSeats: TicketSeat[],
+  selectedSeats: TicketSeat[],
+  handleSeatClick: (seat: TicketSeat) => void;
 }) => {
   const theme = useTheme();
 
-  const getSeatColor = (seat: Seat) => {
-    switch (seat.status) {
-      case "booked":
-        return "secondary";
-      default:
-        return seat.type === "lux"
-          ? "#b02e2f"
-          : theme.palette.mode === "light"
-          ? "#000000"
-          : "#ffffff";
-    }
-  };
+  const isReserved = (seat: TicketSeat) => reservedSeats.some(item=>item.row===seat.row && item.seat===seat.seat);
+  const isSelected = (seat: TicketSeat) => selectedSeats.some(item=>item.row===seat.row && item.seat===seat.seat);
 
-  const calculateSeatPlanWidth = () => {
-    let seatsInARow = 0;
-    for (let seatRow in seats) {
-      if (seats[seatRow].length > seatsInARow) {
-        seatsInARow = seats[seatRow].length;
-      }
-    }
-
-    return `${seatsInARow * 58}px`;
+  const getSeatColor = (seat: TicketSeat) => {
+    if(isReserved(seat))
+      return theme.palette.secondary.main;
+    if (seat.row===rows)
+      return theme.palette.primary.main;
+    return theme.palette.text.primary;
   };
 
   return (
@@ -60,14 +56,14 @@ const SeatPlan = ({
         sx={{
           position: "relative",
           mb: "125px",
-          width: calculateSeatPlanWidth(),
+          width: `${seats * 58}px`,
           mx: "auto",
         }}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="0 0 806 21"
-          fill={theme.palette.mode === "light" ? "#061420" : "#ffffff"}
+          fill={theme.palette.text.primary}
         >
           <path d="M3.2,20l-2,0.2l-0.3-4l2-0.2C136.2,5.3,269.6,0,403,0s266.8,5.3,400.2,16l2,0.2l-0.3,4l-2-0.2 C669.5,9.3,536.3,4,403,4S136.4,9.3,3.2,20z"></path>
         </svg>
@@ -84,60 +80,56 @@ const SeatPlan = ({
       </Box>
 
       {/* Seatplan */}
-      {Object.entries(seats).map(([rowNumber, seats]) => (
+      {[...Array(rows)].map((item, row) => (
         <Box
-          key={rowNumber}
+          key={row}
           sx={{
             display: "flex",
             justifyContent: "space-between",
             marginBottom: "8px",
-            width: calculateSeatPlanWidth(),
+            width: `${seats * 58}px`,
             mx: "auto",
           }}
         >
-          {seats.map((seat: Seat) => (
+          {[...Array(seats)].map((item2, seat) => (
             <Tooltip
               arrow
-              key={seat.id}
+              key={seat}
               title={
                 <Box sx={{ textAlign: "center" }}>
-                  {`Row: ${seat.row}, Place: ${seat.place}`}
+                  {`Row: ${row+1}, Place: ${seat+1}`}
                   <br />
                   {`Price: `}
-                  <span style={{ fontWeight: 600 }}>{seat.price} uah</span>
+                  <span style={{ fontWeight: 600 }}>{price} $</span>
                 </Box>
               }
             >
               <IconButton
-                onClick={() => handleSeatClick(seat)}
-                disabled={seat.status === "booked"}
+                onClick={() => handleSeatClick({row: row+1, seat: seat+1})}
+                disabled={isReserved({row: row+1, seat: seat+1})}
                 sx={{
                   position: "relative",
                   boxSizing: "border-box",
                   border: "1px solid",
                   borderColor:
-                    seat.status === "selected"
-                      ? seat.type === "lux"
+                    isSelected({row: row+1, seat: seat+1})
+                      ? row+1===rows
                         ? theme.palette.primary.main
-                        : theme.palette.mode === "light"
-                        ? "black"
-                        : "white"
+                        : theme.palette.text.primary
                       : "transparent",
 
                   "&:hover": {
                     bgcolor:
-                      seat.type === "lux"
-                        ? "rgba(176, 46, 47, 0.2)"
-                        : theme.palette.mode === "light"
-                        ? "grey.400"
-                        : "inherit.hover",
+                    row+1===rows
+                        ? alpha(theme.palette.primary.main, 0.3)
+                        : alpha(theme.palette.text.primary, 0.3),
                   },
                   "&.Mui-disabled": {
-                    color: "grey.400",
+                    color: theme.palette.secondary.main,
                   },
                 }}
               >
-                {seat.status === "booked" && (
+                {isReserved({row: row+1, seat: seat+1}) && (
                   <Box
                     sx={{
                       position: "absolute",
@@ -153,10 +145,7 @@ const SeatPlan = ({
                   >
                     <ClearIcon
                       sx={{
-                        color:
-                          theme.palette.mode === "light"
-                            ? "#000000"
-                            : "#b02e2f",
+                        color:theme.palette.error.main,
                         fontSize: "1.5rem",
                       }}
                     />
@@ -165,7 +154,7 @@ const SeatPlan = ({
                 <Chair
                   fontSize="large"
                   sx={{
-                    fill: getSeatColor(seat),
+                    fill: getSeatColor({row: row+1, seat: seat+1}),
                   }}
                 />
               </IconButton>
@@ -177,7 +166,7 @@ const SeatPlan = ({
       {/* Legend with different seat types explanation */}
       <Stack
         spacing={3}
-        sx={{ mx: "auto", mt: 4, width: calculateSeatPlanWidth() }}
+        sx={{ mx: "auto", mt: 4, width: `${seats * 58}px` }}
       >
         <Divider />
 
@@ -186,7 +175,7 @@ const SeatPlan = ({
             icon={
               <Chair
                 sx={{
-                  fill: theme.palette.mode === "light" ? "black" : "white",
+                  fill: theme.palette.text.primary,
                 }}
               />
             }
@@ -206,7 +195,7 @@ const SeatPlan = ({
                   position: "relative",
                   padding: 0,
                   "&.Mui-disabled": {
-                    color: "grey.400",
+                    color: theme.palette.secondary.main,
                   },
                 }}
               >
@@ -225,8 +214,7 @@ const SeatPlan = ({
                 >
                   <ClearIcon
                     sx={{
-                      color:
-                        theme.palette.mode === "light" ? "#000000" : "#b02e2f",
+                      color:theme.palette.error.main,
                       fontSize: "1.2rem",
                     }}
                   />

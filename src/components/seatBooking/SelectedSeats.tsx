@@ -1,16 +1,25 @@
-import { Box, Button, IconButton, Stack, Typography } from "@mui/material";
-import { Seat, SeatBookingInfo } from "../../pages/seatBooking/SeatBookingPage";
-import { useTheme } from "@emotion/react";
+import { Box, Button, IconButton, Stack, Typography, useTheme } from "@mui/material";
 import ClearIcon from "@mui/icons-material/Clear";
+import { TicketSeat } from "../../models/tickets";
+import { SerializedError } from "@reduxjs/toolkit";
+import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
+import ErrorDisplay from "../common/ErrorDisplay";
 
 function SelectedSeats({
   selectedSeats,
+  price,
+  rows,
   handleDeleteTicketClick,
   handleBookingTicketClick,
+  loading, error,
 }: {
-  selectedSeats: Seat[];
-  handleDeleteTicketClick: (seat: Seat) => void;
-  handleBookingTicketClick: (seat: SeatBookingInfo) => void;
+  price: number,
+  rows: number,
+  selectedSeats: TicketSeat[];
+  handleDeleteTicketClick: (seat: TicketSeat) => void;
+  handleBookingTicketClick: () => void;
+  loading?: boolean,
+  error?: FetchBaseQueryError | SerializedError,
 }) {
   const theme = useTheme();
 
@@ -27,21 +36,18 @@ function SelectedSeats({
           },
         }}
       >
-        {selectedSeats.map((seat) => (
+        {selectedSeats.map((seat, index) => (
           <Box
-            key={seat.id}
+            key={index}
             sx={{
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
               gap: "20px",
               border: "1px solid transparent",
-              borderColor:
-                seat.type === "lux"
+              borderColor: seat.row === rows
                   ? "primary.main"
-                  : theme.palette.mode === "light"
-                  ? "#000000"
-                  : "#ffffff",
+                  : 'text.primary',
               padding: "8px 15px",
               borderRadius: "8px",
             }}
@@ -66,13 +72,13 @@ function SelectedSeats({
               <Box>
                 <Typography variant="caption">Place</Typography>
                 <Typography variant="body2" sx={{ fontWeight: 700 }}>
-                  {seat.place} <span>&mdash;</span> {seat.type.toUpperCase()}
+                  {seat.seat} <span>&mdash;</span> {seat.row===rows? 'Lux' : 'Standart'}
                 </Typography>
               </Box>
               <Box>
                 <Typography variant="caption">Price</Typography>
                 <Typography variant="body2" sx={{ fontWeight: 700 }}>
-                  {seat.price} UAH
+                  {price} $
                 </Typography>
               </Box>
             </Box>
@@ -102,16 +108,17 @@ function SelectedSeats({
         sx={{ mt: 1, fontWeight: 600, textAlign: "center" }}
       >
         Total:{" "}
-        <span style={{ color: "#b02e2f" }}>
-          {selectedSeats.reduce((sum, seat) => sum + seat.price, 0)} UAH
+        <span style={{ color: theme.palette.text.primary }}>
+          {(price*selectedSeats.length).toFixed(3)} $
         </span>
       </Typography>
-
+      <ErrorDisplay error={error} sx={{mt:1}}/>
       <Button
         variant="contained"
         size="large"
         sx={{ mt: 2, width: "100%", fontWeight: 600 }}
         onClick={handleBookingTicketClick}
+        loading={loading}
       >
         Proceed to Payment
       </Button>

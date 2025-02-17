@@ -24,7 +24,7 @@ export default function LoadingComponent({ loading, error, skeleton, refetch, ch
                 </> :
                 error ?
                     <>{errorComponent ? errorComponent :
-                        <Typography variant='h6' color='error' textAlign='center' display='flex' alignItems='center' height={height} justifyContent='center' >
+                        <Typography width='100%' variant='h6' color='error' textAlign='center' display='flex' alignItems='center' height={height} justifyContent='center' >
                             An error occurred while loading
                             <IconButton sx={{ marginLeft: 1 }} onClick={refetch}>
                                 <Update />

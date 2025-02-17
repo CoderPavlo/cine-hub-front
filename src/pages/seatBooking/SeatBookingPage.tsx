@@ -9,129 +9,55 @@ import {
   Paper,
   Tooltip,
   Typography,
+  useTheme,
 } from "@mui/material";
 import QuestionMarkIcon from "@mui/icons-material/QuestionMark";
-import { useLocation } from "react-router-dom";
+import { useLocation, useSearchParams } from "react-router-dom";
 import { CalendarToday, LocationOn, Schedule } from "@mui/icons-material";
-import { useTheme } from "@emotion/react";
 import SeatPlan from "../../components/seatBooking/SeatPlan";
 import { useState } from "react";
 import SelectedSeats from "../../components/seatBooking/SelectedSeats";
-
-export interface Seat {
-  id: string;
-  row: number;
-  place: number;
-  status: "available" | "booked" | "selected";
-  type: "standard" | "lux";
-  price: number;
-}
-
-export interface SeatBookingInfo {
-  movieId: string;
-  auditorium: string;
-  cinema: string;
-  date: string;
-  format: string;
-  time: string;
-  seats: Seat[];
-}
-
-function mockSeatPlan() {
-  const index = ["A", "B", "C", "D", "E", "F", "G", "H", "I"];
-  const seats: Seat[] = [];
-  for (let i = 0; i <= 8; i++) {
-    for (let j = 0; j < 8; j++) {
-      seats.push({
-        id: index[i] + i + j,
-        row: i + 1,
-        place: j + 1,
-        status: Math.floor(Math.random() * 7) > 4 ? "booked" : "available",
-        type: i === 8 ? "lux" : "standard",
-        price: i === 8 ? 280 : 180,
-      });
-    }
-  }
-
-  const seatRows = seats.reduce((acc, s) => {
-    if (!acc[s.row]) {
-      acc[s.row] = [];
-    }
-    acc[s.row].push(s);
-    return acc;
-  }, {} as Record<string, Seat[]>);
-
-  return seatRows;
-}
-
-const initialSeats = mockSeatPlan();
-
-const formatDescription = {
-  SDH: "Subtitles for the Deaf or Hard-of-Hearing",
-  LUX: "A session on recliner chairs that provide increased viewing comfort for movie enthusiasts",
-  VIP: "A session in a separate hall with the option of waiter service directly during the session",
-};
+import serverAPI from "../../store/api/server";
+import { BASE_IMG_URL } from "../../helpers/apiConfig";
+import dayjs from "dayjs";
+import { themoviedbAPI } from "../../store/api/themoviedb";
+import { TicketSeat } from "../../models/tickets";
 
 const SeatBookingPage: React.FC = () => {
-  const [seats, setSeats] = useState(initialSeats);
-  const [selectedSeats, setSelectedSeats] = useState<Seat[]>([]);
 
   const theme = useTheme();
+  const [selectedSeats, setSelectedSeats] = useState<TicketSeat[]>([]);
 
-  const { state: sessionInfo } = useLocation();
+  const [searchParams] = useSearchParams();
+  const id = searchParams.get('id') || '';
+  const { data } = serverAPI.useFetchReservedQuery(id);
+  const { data: movie } = themoviedbAPI.useFetchMovieQuery(data?.session.filmId || 0);
 
-  const handleSeatClick = (seat: Seat) => {
-    if (seat.status === "booked") return;
-
-    const newStatus = seat.status === "available" ? "selected" : "available";
-
-    const rowIndex = seat.row;
-
-    const updatedRow = seats[rowIndex].map((s) =>
-      s.id === seat.id ? { ...s, status: newStatus } : s
+  const handleSeatClick = (seat: TicketSeat) => {
+    setSelectedSeats(prev =>
+      prev.some(item => item.row === seat.row && item.seat === seat.seat) ?
+        prev.filter(item => !(item.row === seat.row && item.seat === seat.seat)) :
+        [...prev, seat]
     );
-
-    const updatedSeats = { ...seats, [rowIndex]: updatedRow };
-
-    const newSelected =
-      newStatus === "selected"
-        ? [...selectedSeats, seat]
-        : selectedSeats.filter((s) => s.id !== seat.id);
-
-    setSeats(updatedSeats);
-    setSelectedSeats(newSelected);
   };
 
-  const handleDeleteTicketClick = (seat: Seat) => {
-    const rowIndex = seat.row;
-
-    const updatedRow = seats[rowIndex].map((s) =>
-      s.id === seat.id ? { ...s, status: "available" } : s
+  const handleDeleteTicketClick = (seat: TicketSeat) => {
+    setSelectedSeats(prev =>
+      prev.filter(item => !(item.row === seat.row && item.seat === seat.seat))
     );
-
-    const updatedSeats = { ...seats, [rowIndex]: updatedRow };
-    const newSelected = selectedSeats.filter((s) => s.id !== seat.id);
-
-    setSeats(updatedSeats);
-    setSelectedSeats(newSelected);
   };
+  const [create, { isLoading, error }] = serverAPI.useCreateTicketMutation();
 
-  function handleBookingTicketClick() {
-    selectedSeats.map((s) => s.status === "booked");
-
-    const { movieId, auditorium, cinema, date, format, time } = sessionInfo;
-    const result = {
-      movieId,
-      auditorium,
-      cinema,
-      date,
-      format,
-      time,
-      seats: selectedSeats,
-    };
-    console.log("ALL INFO ABOUT TICKET BOOKING:");
-    console.log(result);
-    return result;
+  const handleBookingTicketClick = async () => {
+    selectedSeats.forEach(async item => {
+      await create({
+        sessionId: id,
+        rowNumber: item.row,
+        seatNumber: item.seat,
+        price: Number(data?.session.price),
+      });
+    });
+    setSelectedSeats([]);
   }
 
   return (
@@ -163,7 +89,7 @@ const SeatBookingPage: React.FC = () => {
             <CardMedia
               component="img"
               sx={{ width: "220px", borderRadius: "8px" }}
-              image={sessionInfo.posterUrl}
+              image={`${BASE_IMG_URL}original/${movie?.poster_path}`}
               alt="Movie poster"
             />
             <Box
@@ -180,30 +106,16 @@ const SeatBookingPage: React.FC = () => {
                   fontWeight: 700,
                 }}
               >
-                {sessionInfo.movieName}
+                {data?.session.filmName}
               </Typography>
               <Box>
-                {sessionInfo.format.split(" ").map((f: string, i: number) => (
-                  <Tooltip
-                    key={i}
-                    title={`${formatDescription[f]}`}
-                    arrow
-                    placement="top"
-                  >
-                    <Chip
-                      label={f}
-                      component="span"
-                      icon={<QuestionMarkIcon />}
-                      sx={{
-                        mr: 2,
-                        "& .MuiChip-icon": {
-                          fontSize: "16px",
-                          ml: "8px",
-                        },
-                      }}
-                    />
-                  </Tooltip>
-                ))}
+                <Chip
+                  label={data?.session.formatType}
+                  component="span"
+                  sx={{
+                    mr: 2,
+                  }}
+                />
               </Box>
               <Card sx={{ display: "flex" }}>
                 <Box
@@ -242,7 +154,7 @@ const SeatBookingPage: React.FC = () => {
                       fontSize: "16px",
                     }}
                   >
-                    {sessionInfo.cinema}
+                    {data?.session.cinemaLocation}
                   </Typography>
                   <Typography
                     variant="subtitle1"
@@ -251,7 +163,7 @@ const SeatBookingPage: React.FC = () => {
                       fontSize: "14px",
                     }}
                   >
-                    Hall: {sessionInfo.auditorium}
+                    Hall: {data?.session.auditoriumName}
                   </Typography>
                 </CardContent>
               </Card>
@@ -292,10 +204,7 @@ const SeatBookingPage: React.FC = () => {
                       fontSize: "16px",
                     }}
                   >
-                    {`${sessionInfo.date.slice(-2)}.${sessionInfo.date.slice(
-                      -5,
-                      -3
-                    )}.${sessionInfo.date.slice(0, 4)}`}
+                    {dayjs(data?.session.startTime).date()}
                   </Typography>
                   <Typography
                     variant="subtitle1"
@@ -304,9 +213,7 @@ const SeatBookingPage: React.FC = () => {
                       fontSize: "14px",
                     }}
                   >
-                    {new Date(sessionInfo.date).toLocaleDateString("en-GB", {
-                      weekday: "long",
-                    })}
+                    {dayjs(data?.session.startTime).format("dddd")}
                   </Typography>
                 </CardContent>
               </Card>
@@ -347,7 +254,7 @@ const SeatBookingPage: React.FC = () => {
                       fontSize: "16px",
                     }}
                   >
-                    {sessionInfo.time}
+                    {dayjs(data?.session.startTime).format('HH:mm')}
                   </Typography>
                   <Typography
                     variant="subtitle1"
@@ -364,7 +271,7 @@ const SeatBookingPage: React.FC = () => {
           </Box>
 
           {/* Seat Plan */}
-          <SeatPlan seats={seats} handleSeatClick={handleSeatClick} />
+          <SeatPlan selectedSeats={selectedSeats} price={data?.session.price || 0} seats={data?.seats || 0} rows={data?.rows || 0} reservedSeats={data?.reservedSeats || []} handleSeatClick={handleSeatClick} />
         </Grid2>
 
         <Grid2 sx={{ width: "470px", mx: "auto" }}>
@@ -397,7 +304,7 @@ const SeatBookingPage: React.FC = () => {
                 }}
               >
                 Your tickets:{" "}
-                <span style={{ color: "#b02e2f" }}>{selectedSeats.length}</span>
+                <span style={{ color: theme.palette.primary.main }}>{selectedSeats.length}</span>
               </Typography>
               <Typography
                 variant="h6"
@@ -409,16 +316,20 @@ const SeatBookingPage: React.FC = () => {
                 }}
               >
                 Price:{" "}
-                <span style={{ color: "#b02e2f" }}>
-                  {selectedSeats.reduce((sum, seat) => sum + seat.price, 0)} UAH
+                <span style={{ color: theme.palette.primary.main }}>
+                  {((data?.session.price || 0) * selectedSeats.length).toFixed(3)} $
                 </span>
               </Typography>
             </Box>
             <Box sx={{ bgcolor: "background.default", borderRadius: 2 }}>
               <SelectedSeats
+                price={data?.session.price || 0}
+                rows={data?.rows || 0}
                 selectedSeats={selectedSeats}
                 handleDeleteTicketClick={handleDeleteTicketClick}
                 handleBookingTicketClick={handleBookingTicketClick}
+                loading={isLoading}
+                error={error}
               />
             </Box>
           </Paper>
