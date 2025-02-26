@@ -1,0 +1,50 @@
+.container-login {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.cinema-title-container {
+  width: 50%;
+  padding-right: 100px;
+}
+
+.form-registration {
+  width: 50%;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  border: none;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(227, 211, 211, 0.837),
+    0 8px 16px rgba(217, 204, 204, 0.835);
+  padding: 25px 15px 25px;
+}
+
+.switch-selector-container {
+  margin: 30px auto;
+  font-size: 20px;
+  max-width: 300px;
+  height: 40px;
+}
+
+@media (max-width: 768px) {
+  .cinema-title-container {
+    display: none;
+  }
+  .form-registration {
+    width: 100%;
+    max-width: 600px;
+  }
+  .container-login {
+    width: 100%;
+    justify-content: center;
+  }
+}
