@@ -94,7 +94,6 @@ export default function AboutMoviePage() {
       );
   }, [movieId]);
 
-  movieData ? console.log(movieData) : "";
 
   if (!movieData) {
     return (
